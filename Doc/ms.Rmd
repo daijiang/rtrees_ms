@@ -1,8 +1,16 @@
 ---
-title: "Your Awesome Title"
-author: "Author One^1^* and Author Two^2^"
-date: '`r format(Sys.time())`'
+title: "rtrees: an R package to assemble phylogenetic trees from megatrees"
+author: "Daijiang Li^1,2^*"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
+  bookdown::html_document2:
+    number_sections: no
+    theme: readable
+    toc: yes
+  bookdown::word_document2:
+    toc: no
+    reference_docx: template/nature_style.docx
+    number_sections: no
   bookdown::pdf_document2:
     includes:
       before_body: template/doc_prefix.tex
@@ -11,17 +19,9 @@ output:
     latex_engine: xelatex
     number_sections: no
     toc: no
-  bookdown::html_document2:
-    number_sections: no
-    theme: readable
-    toc: yes
   bookdown::tufte_html2:
     number_sections: no
     toc: yes
-  bookdown::word_document2:
-    toc: no
-    reference_docx: template/nature_style.docx
-    number_sections: no
 fontsize: 12pt
 linestretch: 1.5
 link-citations: yes
@@ -32,18 +32,20 @@ links-as-notes: true
 notes-after-punctuation: false
 ---
 
-```{r knitr_options, echo=FALSE}
-library(knitr)
+```{r knitr_options, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+xfun::pkg_attach2(c("knitr", "dplyr"))
 # rstudio will set the folder where .Rmd file seats as work directory
 # set it back to the folder where .Rproj seats
+
 opts_knit$set(root.dir = normalizePath("../")) 
 opts_chunk$set(fig.align = 'center', cache = FALSE, warning = FALSE,
   message = TRUE, echo = FALSE, fig.pos = "H", out.extra = "")
 options(digits = 3, width = 88,
         # use pdf file automatically when compile to pdf
         knitr.graphics.auto_pdf = TRUE, 
-        knitr.kable.NA = '')
-
+        knitr.kable.NA = '',
+        crayon.enabled = knitr::is_html_output())
+  
 # download template files if not available
 tpl_1 = 'https://raw.githubusercontent.com/dlilab/manuscript_template/master/Doc/template/preamble.tex'
 tpl_2 = 'https://raw.githubusercontent.com/dlilab/manuscript_template/master/Doc/template/doc_prefix.tex'
@@ -59,140 +61,240 @@ if(knitr::is_latex_output() | knitr::is_html_output()){
 } else {
   options(kableExtra.auto_format = FALSE) # for docx
 }
+library(rtrees)
 ```
 
-\footnotesize 
+\footnotesize
 
-^1^Department of Biological Sciences, Louisiana State University, Baton Rouge, LA, USA  
+^1^Department of Biological Sciences, Louisiana State University, Baton Rouge, LA, USA\
 ^2^Center for Computation & Technology, Louisiana State University, Baton Rouge, LA, USA
 
-\* **Corresponding author**, email: daijianglee@gmail.com; 125 Life Science Building, Baton Rouge, LA 70803
+\* **Corresponding author**, email: [daijianglee\@gmail.com](mailto:daijianglee@gmail.com){.email}; 125 Life Science Building, Baton Rouge, LA 70803
 
 \normalsize
 
-**Running headline**: Environment and species richness
+**Running headline**: Tool to assemble phylogenetic trees
 
-**Abstract**: Your awesome abstract here.
+**Number of words**: 3985;  **Number of Tables**: 1; **Number of Figures**: 1
+
+**Abstract**: Despite the increasingly available phylogenetic hypotheses for multiple taxonomic groups, most of them do not include all species. In phylogenetic ecology, there is still strong demand to have phylogenies with all species in a study included. The existing software tools to graft species to backbone megatrees, however, are mostly limited to a specific taxonomic group such as plants or fishes. Here, I introduce a new user-friendly R package `rtrees` that can assemble phylogenies from existing or user-provided megatrees. For most common taxonomic groups, users can only provide a vector of species scientific names to get a phylogeny or a set of posterior phylogenies from megatrees. It is my hope that `rtrees` can provide an easy, flexible, and reliable way to assemble phylogenies from megatrees, facilitating the progress of phylogenetic ecology.
+
+*Keywords*: Pruned phylogeny, Supertree, Phylogenetics, Phylogenetic ecology, Community ecology
 
 \clearpage
 
 # Introduction
 
-Here is your introduction. It should describe clearly the rationale for the study being done and the previous work related with the study. It should also tell readers about your specific hypothese/questions being addressed. Citations will be like this [@adair_single-pool_2010], or [e.g., @clark_loss_2008], or [@eriksson_seed_1993; @williamson_dissolved_1999]
+Phylogenetic trees represent hypotheses about the evolutionary history of species, providing essential context for us to understand a wide range of ecological and evolutionary questions such as trait evolution, species interactions, and community assembly [@baum2012tree; @webb2002phylogenies; @faith1992conservation; @cavender2009merging]. With the increasingly available genetic and fossil data as well as the development of theories and software tools, established backbone phylogenies are now available for multiple taxonomic groups [e.g., @jetz2012global; @smith2018constructing; @hinchliff2015synthesis; @upham2019inferring; @rabosky2018inverse; @faurby2018phylacine; @jetz2018interplay; @tonini2016fully; @stein2018global]. The increasing availability of phylogenies has advanced multiple fields, with phylogenetic ecology being at the top of the list [@webb2002phylogenies; @cavender2009merging; @swenson2019phylogenetic; @maclvor2016phylogenetic].
 
-Here is the second paragraph of the introduction. 
+Comprehensive phylogenies with as many of the target species to be included as possible are needed for studies in phylogenetic ecology. However, it is still common that only a fraction of the target species can be found in the available phylogenies for many taxonomic groups becaus of the lack of sequence data. This situation leaves two options for ecologist. The first one is to collaborate with phylogenetists to generate their own phylogenies based on sequence data so that all target species will be included. Such phylogenies were referred as purpose-build phylogenies [@li2019common]. This option normally requires a large amount of effort to sample sequence data and then to assemble a phylogeny using established methods, which requires specific expertise to being applied appropriately. The second option is to derive their phylogenies from existing large synthetic phylogenies by grafting missing species onto the synthetic phylogenies using taxonomic ranks. Such phylogenies were referred as synthesis-based phylogeny [@li2019common], which have been demonstrated to give similar results as those based on purpose-build phylogenies for most questions asked in phylogenetic ecology such as calculating phylogenetic diversity and estimating phylogenetic signal of traits [@swenson2009phylogenetic;@li2019common; @cadotte2015phylogenetic].
 
+Several computational tools exist to derive sythesis-based phylogenies. The oldest and most widely used one is phylomatic [@webb2005phylomatic]. Since published in 2005, phylomatic has been cited more than 1,000 times and contributed significantly to the development of the field of phylogenetic ecology. Phylomatic was written with C (standalone program) or GNU Awk (online program) and is fast. However, the warning/error messages sometimes are hard for users to understand. Furthermore, the grafting process within phylomatic depends on the node information of the mega-trees; however, phylomatic did not pre-process the mega-trees (at least for user provided ones) and thus only be able to graft species with congeneric in the mega-trees. Phylomatic provided a standalone and an online version. To use its standalone version, users need to have some basic knowledge about the command line (i.e., terminal). Its online service is easier to use. However, it limits the number of target species to be no more than 5,000 and is likely to be discontinoued in the future (it was out of service for a while during 2021). Another recent similar tool is the set of `S.PhyloMaker`, `V.PhyloMaker`, and `V.PhyloMaker2`, a serial of R packages developed by the same group to derive phylogenies for vascular plant species [@jin2019v]. These packages work well but are limited to vascular plants and their package structures and documentations can be improved by following the best practices of R package development [@wickham2015r]. For example, a simple check of the `V.PhyloMaker` package gave 2 warnings and 4 notes. Both phylomatic and the `V.PhyloMaker` set of R packages require the users to provide the taxonomic classification (genus and family) of the target species. Another R package `FishPhyloMaker` was developed recently to derive sythesis-based phylogenies for finned-ray fishes [@nakamura2021fishphylomaker] based on the fish tree of life megatree [@rabosky2018inverse]. Users can simply provide a list of species names and `FishPhyloMaker` will retrive the taxonomic classification information; when such information cannot be found, users are asked to enter it manually. It also will retrive such information for the tips in the megatree that are in the same genus (if congeneric species exist in the megatree), family (if no congeneric species in the megatree), or order (if no co-family species in the megatree) of the target species with every call of the function. Such a design requires internet access and can be slow.
 
-# Methods
-
-Here is the method section. You can include equations easily. For inline equations, use $\text{var}(X) = p(1-p)$. For display equation, use
-
-$$\text{var}(X) = p(1-p)$$
-
-## Results
+What is missing from the tool box of phylogenetic ecologists is a user friendly program that can derive synthesis-based phylogenies for most common taxonomic groups with existing megatrees by taking a species list. If a large set of posterior phylogenies exist for some taxonomic groups, the tool should be able to derive phylogenies from a small number of randomly selected megatrees (e.g., 100) so that uncertainties can be accounted for in the downstream analyses. To fill this gap, I developed an R package named `rtrees`. With `rtrees`, users only need to provide a species list to derive phylogeny or phylogenies for taxonomic groups with existing established megatrees, which have been processed and hosted in a separate R data package `megatrees`. Users can also provide their own megatrees if needed. For species list with over 200 species, a progress bar will show to indicate the percentage of jobs that have been finished. I also provided a shinny app for users who want to derive phylogenies online when the number of missing species is less than 1,000.
 
 
-#### Tables
+# Package installation
 
-Insert tables by `kable` in knitr package in R. Then cross-reference it back with: see Table \@ref(tab:tableName).
+``` r
+install.packages('rtrees', repos = 'https://daijiang.r-universe.dev')
+```
 
-(ref:captionTable1) **Model coefficients of leaf senescence based on in situ data**. No space at the end of this line!!
+The code above will also install the data package `megatrees`, which hosts a collection of existing synthetic megatrees for amphibians, birds, fishes, mammals, plants, reptiles, and sharks (see Table \@ref(tab:megaTable) for details).
 
-```{r tableName,results='asis',echo=FALSE, message=F, warning=F}
-source("R/rcode.R")
-# linesep = c('', '', '', '', '', '\\addlinespace') 
-# can be used within kable to specify linespace
-knitr::kable(sprich, booktabs = T, caption = '(ref:captionTable1)')  %>%
+# Usage scenarios
+
+`rtrees` can be used in the following exemplary scenarios. In all scenarios, we can use the function `rtrees::get_tree()` to get the phylogenies. See the examples section for details about its usage.
+
+1.  We have a list of species, and we want to derive a phylogeny of those species from existing megatrees (i.e., synthetic phylogenies) for our analyses such as estimating phylogenetic signal of species traits, or calculating phylogenetic diversity and investigating phylogenetic structures of communities. For these kinds of analyses, a phylogeny derived from synthetic megatree provides robust results [@li2019common].
+2.  We have a phylogeny based on sequence data (i.e., a purpose-build phylogeny) and we want to insert more species in the phylogeny, potentially as polytomies with their congeneric or co-family species in the phylogeny because of the lack of sequence data.
+3.  We have a phylogeny for the species pool. However, we have species that cannot be identifed at species level with certainty (e.g., *Carex spp*). Such morphological species can be binded into the phylogeny using `rtrees` so that we don't need to throw them away for the downstream analysis.
+4.  We can find a set of existing posterior phylogenies that include all or most of our species. However, there are thousands of such posterior phylogenies in the datasets (e.g., phylogenies provided by VertLife https://vertlife.org/). For our analyses, we only need a smaller number of randomly selected posterior phylogenies to account for the uncertainty of phylogenetic hypotheses. Previous studies suggested that 100 randomly selected phylogenies is generally enough to capture the uncertainties [@upham2019inferring; @nakagawa2019general; @li2018species]. R data package `megatrees` can save us time to repeat this download-and-subset process by providing 100 randomly selected posterior phylogenies. R package `rtrees` will use these 100 randomly selected phylogenies to derive 100 phylogenies for the species list we have.
+
+# Shinny app for a small number of species
+
+I have also developed a shinny app (<https://djli.shinyapps.io/rtrees_shiny/>) to get phylogenies when the number of missing species is small (\< 1,000). The main usage scenario of this shinny app is when we want to quickly get a phylogeny or phylogenies for a small number of species without using R. Another main reason to have this limit of 1,000 is because I cannot afford the paid plans provided by the shinny hosting site. When the number of missing species is over 1,000, we should use the R package instead.
+
+# Package Strcture
+
+## Classification information
+
+```{r}
+n_genus = sapply(rtrees::taxa_supported, function(x){
+  dplyr::n_distinct(dplyr::filter(rtrees::classifications, taxon == x)$genus)
+})
+```
+
+The taxonomic classification information (e.g., genus and family of each species) is critical for the pre-process of megatrees (see below) and to determine where a new species should be grafted onto a megatree. Therefore, `rtrees` provides such information in the R object `rtrees::classifications` for common taxonomic groups. In the current version of `rtrees` (`r paste0('v', packageVersion("rtrees"))`), the object `rtrees::classifications` includes `r format(n_genus["plant"], big.mark = ",")` unique genus of plants, `r format(n_genus["fish"], big.mark = ",")` unique genus of fishes, `r format(n_genus["bird"], big.mark = ",")` unique genus of birds, `r format(n_genus["mammal"], big.mark = ",")` unique genus of mammals, `r format(n_genus["reptile"], big.mark = ",")` unique genus of reptiles, `r format(n_genus["amphibian"], big.mark = ",")` unique genus of amphibians, and `r format(n_genus["shark_ray"], big.mark = ",")` unique genus of sharks, rays, and chimaeras. I did not include classification information above the family level (e.g., order) because grafting species above family level may bring too much uncertainties.
+
+For plants, I extracted genus and family information from multiple sources, including [the Plant List](http://www.theplantlist.org/) (superseded by the World Flora Online), the World Flora Online, the Plant of World Online, and Catelogue of Life 2019. When different sources give different family information for the same genus, I used the information provided by the Plant of World Online. For fish, I used the taxonomic information provided by the fish tree of life [@rabosky2018inverse]. @jetz2012global build the bird phylogenies based on the Handbook of the Birds of the World (HBW) and BirdLife International digital checklist version 3 and later updated the taxonomy based on version 5. I downloaded the bird taxonomy from Birdtree.org. Mammal taxonomy information are from two sources: PHYLACINE 1.2 [@faurby2018phylacine] and the mammal diversity database of VertLife [@upham2019inferring]. For genus with different family information from these two sources, I used the information provided by the VertLife. Taxonomy information for amphibians, reptiles, sharks, rays, and chimaeras were all provided by the Vertlife (https://vertlife.org/).
+
+## Sources and preparation of megatrees
+
+Sources of exisiting megatrees for different taxonomic groups were described in Table \@ref(tab:megaTable). For taxonomic groups with multiple posterior phylogenies, a subset of phylogenies (100 for taxonomic groups except fish, see the column of `# of trees` in Table \@ref(tab:megaTable)) were randomly selected. For most analyses, 50-100 randomly selected posterior phylogenies are enough to account for the uncertainties in phylogenetic spaces [@upham2019inferring; @nakagawa2019general; @li2018species]. All megatrees were stored in the `megatrees` R data package with class of `phylo` or `multiPhylo`, the most common data structures of phylogenies used in R.
+
+(ref:megaTable) Brief information about the megatrees included in the `megatrees` package, which will be installed automatically when `rtrees` was installed.
+
+```{r megaTable}
+megatable = tibble::tibble(
+  Taxon = c("Amphibian", "Bird", "Fish", "", "Mammal", "", "Plant", "Reptile (Squamate)", "Shark, Ray, and Chimaera"),
+  `# of species` = c(format(ape::Ntip(megatrees::tree_amphibian_n100[[1]]), big.mark = ","),
+                     format(ape::Ntip(megatrees::tree_bird_n100[[1]]), big.mark = ","),
+                     format(ape::Ntip(megatrees::tree_fish_12k), big.mark = ","), 
+                     format(ape::Ntip(megatrees::tree_fish_32k_n50[[1]]), big.mark = ","),
+                     format(ape::Ntip(megatrees::tree_mammal_n100_phylacine[[1]]), big.mark = ","),
+                     format(ape::Ntip(megatrees::tree_mammal_n100_vertlife[[1]]), big.mark = ","),
+                     format(ape::Ntip(megatrees::tree_plant_otl), big.mark = ","),
+                     format(ape::Ntip(megatrees::tree_reptile_n100[[1]]), big.mark = ","),
+                     format(ape::Ntip(megatrees::tree_shark_ray_n100[[1]]), big.mark = ",")),
+  `# of trees` = c(100, 100, 1, 50, 100, 100, 1, 100, 100),
+  `R object` = c("tree_amphibian_n100", "tree_bird_n100", "tree_fish_12k",
+                 "tree_fish_32k_n50", "tree_mammal_n100_phylacine", "tree_mammal_n100_vertlife",
+                 "tree_plant_otl", "tree_reptile_n100", "tree_shark_ray_n100"),
+  Reference = c("Jetz and Pyron 2018", "Jetz et al. 2012", "Rabosky et al. 2018",
+                "Rabosky et al. 2018", "Faurby et al. 2018", "Upham et al. 2019",
+                "Smith and Brown 2018", "Tonini et al. 2016", "Stein et al. 2018")
+)
+knitr::kable(megatable,  booktabs = T, caption = "(ref:megaTable)") |>
  kableExtra::kable_styling(bootstrap_options = c("striped", "scale_down", "condensed", "hover"), 
-                           latex_options = c("striped", "HOLD_position")) # , "scale_down"
-```
-
-Put results inline, e.g. the mean species richness is `r meansprich`.
-
-#### Insert tables by `xtable` package in R
-
-
-Show as Table. \ref{t:anova}:
-
-```{r echo=F,results='asis',warning=F,message=F}
-library(xtable)
-envi.summ = xtable(summary(envi.aov),label = "t:anova", caption = "Caption here")
-print(envi.summ,
-		caption.placement = "top",
-	  floating=T,
-	  hline.after=NULL,
-	  comment = FALSE,
-	  add.to.row=list(pos=list(-1,0, nrow(envi.summ)),
-	  command=c(
-		   '\\toprule\n',
-		  '\\midrule\n',
-		   '\\bottomrule\n')))
-```
-
-#### Insert tables by hand
-
-
-Show as Table. \@ref(tab:byhand):
-
-Table: (#tab:byhand) Caption here.
-
-Col A             Col B       Col C                   Col D
-------------      -------     ------------------      ------------------
-row 1             190         $112 \pm 2$             $233 \pm 3$
-$\eta$            0.13        0.12                    0.12
-$\eta^2$          0.14        0.13                    0.50
-$\eta^3$          0.15        0.31                    0.52
-
-
-#### Figures
-
-Insert figure by code chunk. And cross-ref it back as Figure \@ref(fig:figName).
-
-(ref:captionFig1) **No - or _ in the caption ref.** No space at the end of this line!
-
-```{r figName, fig.width=7, fig.asp=1, fig.cap="(ref:captionFig1)"}
-ggplot(data = envi.sprich, aes(x = value, y = sprich)) +
-  geom_point() + geom_smooth(method = "lm") +
-  facet_wrap(~envi, scales = "free_x") + 
-  theme_bw()
+                           latex_options = c("striped", "scale_down", "condensed"))
 ```
 
 
-Or if you already have the figure: 
+Each megatree was processed so that the most recent common ancestors (MRCA) of all the genus and family in the megatrees are determined using the function `rtrees::add_root_info()`. If a genus or a family is not monophyletic, I used the most inclusive MRCA for that genus or family. The MRCA information of each megatree was saved as an extra component named as `genus_family_root` in the corresponding R object (see Table \@ref(tab:megaTable); e.g., `tree_plant_otl$genus_family_root`). The function `rtrees::add_root_info()` will also be used by `rtrees::get_tree()` to process user-provided megatrees.
 
-And cite it as Figure \@ref(fig:fig2).
+## Species names processing
 
-(ref:captionFig2) **No - or _ in the caption ref.** No space at the end of this line!
+R package `rtrees` does not provide functions to standardize taxonomic names because exisiting packages such as `taxize` already provide such features. Users should use such exisiting tools to standardize their species names first, ideally using the same taxonomy backbone as the corresponding megatrees described in Table \@ref(tab:megaTable). When users provide a list of standardized species without information about genus and family (can be a character vector or a data frame with one column named as 'species'), function `rtrees::get_tree()` will automatically call function `rtrees::sp_list_df()` to use the classification information described above to extract the genus and family information needed for binding missing species to the megatrees if the taxonomic group is one of those in Table \@ref(tab:megaTable). Note that if all genus of the species list are already in the megatrees, no classification information will be needed to finish the binding process. Users can also pass prepared classification information to `rtrees::get_tree()`. To do so, the input data frame should have at least three columns: `species`, `genus`, and `family`. Two extra optional columns (`close_sp` and `close_genus`) can also be included in the input data frame to specify where the target species should be grafted into the megatrees. If users provided the classification and/or location information, `rtrees` will honor the user provided information (see examples below).
 
-```{r fig2, out.width='70%', fig.cap="(ref:captionFig2)"}
-knitr::include_graphics(path = paste0(normalizePath(getwd()), "/Figs/plot.pdf"))
+## The binding process
+
+Once the megatrees were processed and the classification information of species were ready, the binding process begins. If all species are already present in the megatrees, no binding will be needed and a prunned phylogeny will be returned. Otherwise, for species that are missing from the megatrees, `rtrees` will first look for congeneric species in the megatrees. If no congeneric species was found in the megatrees, `rtrees` will then look for co-family species in the megatrees. If neither congeneric nor co-family species were found, the target species will be skipped and will be included in the output message with other skipped target species. If either congeneric or co-family species were found in the megatrees, users have three options to bind the target species into the megatrees by setting the `scenario` argument within `rtrees::get_tree()`:
+
+-   The default way is to bind the missing target species as a polytomy at the basal node of the MRCA of the genus or family in the megatrees (scenario = "at_basal_node"); if the megatrees have only one species in the that genus or family, then the missing target species will be inserted to the half of this only species' branch length.
+-   If users set `scenario` to be "random_below_basal", a randomly selected node within the genus or family will be used to bind the missing target species; the probability of a node been selected is proportional to its branch length. Because of the randomness involved with this option, users may want to run this option multiple time (e.g., 50-100) to generate a set of phylogenies.
+-   If users set `scenario` to be "at_or_above_basal", then the missing target species will be binded to the basal node of the same genus or to a new node above the basal node of the family if no congeneric species were found in the megatrees. If the age of the family's basal node is less than 2/3 of the node above it (root node of the family), the missing target species will be binded so that its age will be 2/3 of the root node of the family. Otherwise, the missing target species will be inserted into the middle point of the basal node and the root node of the family. When using the phylogenies derived with this option to calculate community phylogenetic diversity, the results may be inflated (the most among these three scenarios). 
+
+By default, if the number of missing target species is over 200, a progress bar will be shown in the console. Once the binding process is finished, the megatrees will be pruned to only keep the target species. The generated phylogeny will then be ladderized with R function `ape::ladderize()`. When there is only one megatree used, the generated phylogeny will have a class of 'phylo'; when multiple posterior megatrees were used, the generated phylogenies will have a class of 'multiPhylo'. When `show_grafted` is set to `TRUE` (default is `FALSE`) within `rtrees::get_tree()`, binded species will be indicated with trailing `*` or `**` in the tip labels of the generated phylogeny, indicating that a species was binded at the genus and family level, respectively. If such information is important for downstream analyses, users can extract such information as its own data frame using `rtrees::get_graft_status()`. Users can use `rtrees::rm_stars()` to remove all trailing stars from the tip labels of the generated phylogeny.
+
+## Main functions and example applications
+
+In this section, I provide exemplary code to deal with the different situations described in the Usage scenarios section above. The main function to use is `rtrees::get_tree()`. Users can type `?rtrees::get_tree` in the R console to see details.
+
+For the first scenario described in the Usage scenarios section above (i.e., to get a phylogeny for a list of species using an existing synthetic megatree), we can use the following code:
+
+```{r echo=TRUE}
+# create a species list
+species <- c('Meliosma laui', 'Acer cordatum', 'Fraxinus mandshurica',
+            'Ormosia pinnata', 'Aglaia dasyclada', 'Sphagnum_subnitens',
+            'Stephanomeria_cichoriacea', 'Taraxacum_schroeterianum', 
+            'Humiria_balsamifera', 'Salix_cinerea', 'Floerkea_proserpinacoides')
+# get a phylogeny
+sp_tree <- rtrees::get_tree(sp_list = species, taxon = 'plant')
 ```
 
-More details can be found at [here](https://bookdown.org/yihui/bookdown/).
+In the code chunk above, the vector of species names can have either space or underscore in the names; spaces will be replaced by underscores internally within `rtrees::get_tree()`. If no megatree was set by the `tree =` argument, then the `taxon =` argument must be one of the supported taxonomic groups ("amphibian", "bird", "fish", "mammal", "plant", "reptile", and "shark_ray"). Function `rtrees::get_tree()` will print out messages about the number of species been grafted at genus and family level as well as the number of species been skipped if neither congeneric nor co-family species were found in the megatree. In the example above, the skipped species is a moss and the megatree does not have any moss species from the Sphagnaceae family. When the argument `show_grafted` of `rtrees::get_tree()` is set to 'TRUE' (default is 'FALSE'), the tip labels of the generated phylogeny will have a trailing \* if it is grafted at genus level or \*\* if it is grafted at family level. No matter whether `show_grafted` is 'TRUE' or 'FALSE', the grafting information was saved along with the phylogeny and can be extracted with the following code:
+
+```{r echo=TRUE}
+# or use rtrees::get_graft_status()
+sp_tree$graft_status
+```
+
+When users already have a phylogeny for most of their species (i.e., the second and third scenarios described in the Usage scenarios section above), we can use the same code as above, with the argument `tree_by_user = TRUE`. And here is an example using the phylogeny generated above as a pretended megatree that we already have.
+
+```{r warning=FALSE, echo=TRUE}
+more_sp_to_add = c('Ormosia_sp.', 'Fraxinus_americana')
+new_species = c(species, more_sp_to_add)
+sp_tree_2 = rtrees::get_tree(sp_list = new_species, tree = sp_tree, 
+                             taxon = 'plant', tree_by_user = TRUE)
+```
+
+In the code above, as there is a genus (Sphagnum) not included in the user provided phylogeny, we need to specify the `taxon` argument to extract the correct classification information; note that this requires the taxonomic group is one of those supported by `rtrees` (Table \@ref(tab:megaTable)). However, if all genus of the species list are already in the user provided phylogeny, then we can ignore the `taxon` argument:
+
+```{r echo=TRUE}
+# remove Sphagnum_subnitens so that all genus are in the megatree
+new_species_all_in = setdiff(new_species, 'Sphagnum_subnitens')
+sp_tree_3 = rtrees::get_tree(sp_list = new_species_all_in, tree = sp_tree, 
+                             tree_by_user = TRUE)
+```
+
+The function `rtrees::get_tree()` can also work with a set of posterior megatrees (the fourth scenario in the Usage scenarios section) with the option to use parallel computing for the whole process. The default number of cores to be used will be the available number of cores minus 2 (so that users can still perform other tasks on their computers at the same time). The output will be a set of generated phylogenies with class 'multiPhylo'; the number of derived phylogenies will be the same as the input megatrees. For this scenario, we can use exactly the same code described above.
+
+```{r echo=TRUE}
+# bird species
+bird_species =  c('Brachypteryx_major', 'Asthenes_perijana', 'Ciridops_anna', 
+                   'Leiothlypis_ruficapilla', 'Reinwardtoena_reinwardti',
+                   'Garrulax_caerulatus', 'Buteo_rufofuscus', 'Sylvia_mystacea',
+                   'Telophorus_viridis', 'Trachyphonus_darnaudii')
+sp_tree_4 = rtrees::get_tree(sp_list = bird_species, taxon = 'bird')
+sp_tree_4
+```
+
+<!-- Function `rtrees::get_tree()` also allows user specified locations to bind species as described in the Species names processing section above. To demonstrate this feature, I used the same dataset (with different column names) used by @jin2019v; Fig. \@ref(fig:plotTree) is comparable to their Fig. 1b. -->
+
+```{r include=FALSE, eval=FALSE}
+dat <- read.csv(file = 'Data/Appendix_3-Example_species_list.csv')
+sp_tree_5 <- rtrees::get_tree(sp_list = dat, taxon = 'plant',
+                              show_grafted = TRUE)
+```
+
+
+<!-- (ref:capFigTree) Plot of a phylogeny generated by `rtrees` with user specified locations to bind species. Species that were grafted to the basal node of congeneric and co-family species were indicated with one trailing \* and two trailing \*\*, respectively. Data were from @jin2019v. This figure is comparable to their Fig 1b. -->
+
+
+
+## Performance
+
+The R package `rtrees` is a user friendly tool to assemble phylogenies from existing or user provided megatrees despite that it is not as fast as `phylomatic` [@webb2005phylomatic], which was written in C. However, `phylomatic` can give very uninformative error messages in most cases that I have used it. For example, messages below would make it really hard to debug:
+
+    Error: Program 'phylomatic' terminated by SIGNAL (Segmentation fault: 11)
+
+    bad CPU type in executable: phylomatic
+
+I tried to compare the speed of `rtrees` and `phylomatic` but was not able to run `phylomatic` with the large megatrees prepared here after multiple attempts. On the other hand, I was able to compare the performance of `rtrees` and `V.PhyloMaker`. In most cases, `rtrees` is at least two times faster than `V.PhyloMaker` (Fig. \@ref(fig:figSpeed)). For example, with 50 missing species to bind, the average time used by `rtrees` is 0.914 second while `V.PhyloMaker` took 13.6 seconds on average; with 5,000 missing species to bind, `rtrees` used 80.9 seconds on average while `V.PhyloMaker` used 187 seconds. In general, the time used by `rtrees` and `V.PhyloMaker` increased 15.6 and 34.8 seconds on average with 1,000 more missing species to be grafted, respectively. All tests were conducted on a 14' Macbook Pro with M1 pro chip.
+
+(ref:capFigSpeed) Performance comparisons between `rtrees` and `V.PhyloMaker`. For each test, five replications were conducted using both the `rtrees` and `V.PhyloMaker` R package.
+
+```{r figSpeed, fig.width=7, fig.height=5, fig.cap="(ref:capFigSpeed)", message=FALSE}
+library(ggplot2)
+library(grDevices)
+speed_out = readRDS("Data/rtrees_speed_out.rds")
+speed_out = dplyr::mutate(speed_out, n_sp_missing_k = n_sp_missing / 1000, time_s = time/1e9)
+speed_lm = dplyr::group_by(speed_out, expr) |> 
+  dplyr::do(broom::tidy(lm(time_s ~ n_sp_missing_k, data = .))) |> 
+  dplyr::ungroup()
+ggplot(speed_out, aes(x = n_sp_missing_k, y = time_s, color = expr, group = expr)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(x = "Number of binding species (Thousand)",
+       y = "Time (Second)", color = NULL, group = NULL) +
+  scale_x_continuous(breaks = c(0.05, seq(0.5, 5, 0.5))) +
+  scale_y_continuous(breaks = c(0, 10, seq(25, 200, 25))) +
+  geom_text(x = 4, y = 33, label = "rtrees: y = -0.09 + 15.6x", inherit.aes = FALSE, color = "#F8766D") +
+  geom_text(x = 1.8, y = 123, label = "V.PhyloMaker: y = 11.80 + 34.8x", inherit.aes = FALSE, color = "#00BFC4") +
+  cowplot::theme_cowplot() +
+  theme(legend.position = "none") 
+```
+
+I did not compare the performance between `rtrees` and `FishPhyloMaker` here because the later' design to process the fish megatree (e.g., find MRCA for clades) every time whenever we use it makes it really slow. For example, to bind 500 missing fish species, `FishPhyloMaker` took almost 8 minutes while `rtrees` used only 4 seconds.
+
+# Discussion
+
+Based on Fig. \@ref(fig:figSpeed), the time used by `rtrees` (and other R packages such as `V.PhyloMaker` and `FishPhyloMaker`) increased linearly with the number of missing species. This is because of the sequential structure of the R `phylo` object [@paradis2004ape], in which all tips and nodes of a phylogeny are labeled with continoued integers. When a new node or tip needs to be inserted, all the numbers after the binding location need to be pushed one place after. Therefore, the binding of tips in an R `phylo` object is a sequential process, which cannot be conducted with parallel computing to take advantage of the multiple CPU cores a regular computer has nowadays. It is possible to speed it up by converting some core R code into C++. However, it takes a lot of effort to do this right while I don't have extensive knowledge of C++. Another potential resolution is to represent phylogenies in a non-sequential structure unlike `phylo` objects in R. One example is the `mantree` package [@bennett2017treeman], which developed such a structure to perform tree manipulations. Because of the non-sequential structure (i.e., no continous labeling of nodes and tips), it is possible to use parallel computing to process phylogenies. However, such a structure has not yet been adapted widely by the R community. Since the publication of the original paper [@bennett2017treeman] in 2017, it has been cited for only 17 times by October 2022 based on Google Scholar (by contrast, R package `ape` has been cited over 11,100 times since 2004). Therefore, the infrastructure to support such a non-sequential structure in R is still missing, making it hard to use it here in `rtrees`. Despite the limitations described above, `rtrees` is reasonably fast and user friendly with informative messages. The R package `rtrees` is also the only R package that can generate phylogenies for multiple taxonomic groups (Table \@ref(tab:megaTable)) without much effort from the user side. Other packages such as `V.PhyloMaker` and `phylomatic` can do this in theory (as claimed by authors in their papers) [@webb2005phylomatic; @jin2019v]; however, users need to figure out how to do it by themselves.
+
+With the recent advances in phylogenetics of multiple taxonomic groups, more megatrees will be available in the near future (e.g., Lepidoptera [@kawahara2019phylogenomics]). It is relatively easy to include more megatrees beyond those described in Table \@ref(tab:megaTable) as the R package `rtrees` was designed with expandibility in mind. We only need to do two things to include a new megatree. First, the new megatree will be processed with the function `rtrees::add_root_info()` and will be stored in the R data package `megatrees`, which is a dependency of `rtrees`. Second, the classification information (genus and family) will be saved within `rtrees` if it is a new taxonomic group. No further change will be needed for other components of `rtrees`. 
+
+It is my hope that `rtrees` will make it much easier to derive phylogenies from existing megatrees for all common taxonomic groups. Such synthesis-based phylogenies are reliable for most ecological questions such as calculating phylogenetic diversity and estimating phylogenetic signals [@li2019common]. Note that such phylogenies may not be suitable for evolutionary studies such as estimating diversification rates if a large proportion of missing species were included in the derived phylogenies. Therefore, it is also my hope that `rtrees` will facilitate research in phylogenetic ecology. I am committed to maintain and update `rtrees` in the foreseeable future. Since `rtrees` is an open source software, others are more than welcome to contribute by submitting pull requests or openning issues to the GitHub repository (https://github.com/daijiang/rtrees). 
+
+# Data and code availability
+
+No empirical data were used in this paper. The code used for the performance tests can be found in the GitHub repository of this paper (https://github.com/daijiang/rtrees_ms).
+
+
+# Acknowledgement
+
+This study was partly supported by NSF grant DEB \#2213567. I thank Harroop Bedi for his contribution on developing the prototype of the `rtrees` shinny app through the REU program at the Center of Computation & Techology at the Louisiana State University supported by NSF grant OAC \#1852454.
+
 
 # References
 
-<div id="refs"></div>
-
-\clearpage
-
-\setcounter{page}{0}
-\pagenumbering{arabic}
-\setcounter{page}{1}
-
-
-\setcounter{figure}{0}
-\setcounter{table}{0}
-\renewcommand {\thetable}{S\arabic{table}}
-\renewcommand {\thefigure}{S\arabic{figure}}
-
-
-# Supporting Information
-
-## Figures
-
-(ref:captionFigS1) **No - or _ in the caption ref.** No space at the end of this line!
-
-```{r figS1, out.width='70%', fig.cap="(ref:captionFigS1)"}
-knitr::include_graphics(path = paste0(normalizePath(getwd()), "/Figs/plot.pdf"))
-```

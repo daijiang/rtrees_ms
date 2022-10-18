@@ -5,11 +5,11 @@
 \documentclass[
   12pt,
 ]{article}
+\usepackage{amsmath,amssymb}
 \usepackage{lmodern}
 \usepackage{setspace}
-\usepackage{amssymb,amsmath}
-\usepackage{ifxetex,ifluatex}
-\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+\usepackage{iftex}
+\ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
@@ -35,16 +35,49 @@
   \KOMAoptions{parskip=half}}
 \makeatother
 \usepackage{xcolor}
-\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
-\hypersetup{
-  pdftitle={Your Awesome Title},
-  pdfauthor={Author One1* and Author Two2},
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
-\urlstyle{same} % disable monospaced font for URLs
 \usepackage[margin=1in]{geometry}
-\usepackage{longtable,booktabs}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
 \usepackage{etoolbox}
 \makeatletter
@@ -72,16 +105,35 @@
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newlength{\cslentryspacingunit} % times entry-spacing
+\setlength{\cslentryspacingunit}{\parskip}
+\newenvironment{CSLReferences}[2] % #1 hanging-ident, #2 entry spacing
+ {% don't indent paragraphs
+  \setlength{\parindent}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+  \let\oldpar\par
+  \def\par{\hangindent=\cslhangindent\oldpar}
+  \fi
+  % set entry spacing
+  \setlength{\parskip}{#2\cslentryspacingunit}
+ }%
+ {}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{#1\hfill\break}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{#1}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}\break}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
 \usepackage{geometry}
 \geometry{verbose,letterpaper,margin=2.45cm}
 
 % \usepackage[breaklinks=true,pdfstartview=FitH,citecolor=blue]{hyperref}
-\hypersetup{colorlinks,%
-	citecolor=blue,%
-	filecolor=red,%
-	linkcolor=blue,%
-	urlcolor=red,%
-	pdfstartview=FitH}
+\usepackage{hyperref}
+\hypersetup{colorlinks,citecolor=blue,filecolor=red,linkcolor=blue,urlcolor=red,pdfstartview=FitH}
 
 % \usepackage[T1]{fontenc}
 % \usepackage[utf8]{inputenc}
@@ -103,7 +155,7 @@
 % \setstretch{1.8999999999999999}
 
 \usepackage{lineno}
-% \linenumbers
+\linenumbers
 
 \usepackage{flafter}
 \usepackage{float}
@@ -147,16 +199,21 @@
 \usepackage[normalem]{ulem}
 \usepackage{makecell}
 \usepackage{xcolor}
-\newlength{\cslhangindent}
-\setlength{\cslhangindent}{1.5em}
-\newenvironment{cslreferences}%
-  {\setlength{\parindent}{0pt}%
-  \everypar{\setlength{\hangindent}{\cslhangindent}}\ignorespaces}%
-  {\par}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={rtrees: an R package to assemble phylogenetic trees from megatrees},
+  pdfauthor={Daijiang Li1,2*},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
 
-\title{Your Awesome Title}
-\author{Author One\textsuperscript{1}* and Author Two\textsuperscript{2}}
-\date{2021-11-02 15:56:55}
+\title{rtrees: an R package to assemble phylogenetic trees from megatrees}
+\author{Daijiang Li\textsuperscript{1,2}*}
+\date{17 October, 2022}
 
 \begin{document}
 \maketitle
@@ -176,177 +233,391 @@
 
 \normalsize
 
-\textbf{Running headline}: Environment and species richness
+\textbf{Running headline}: Tool to assemble phylogenetic trees
 
-\textbf{Abstract}: Your awesome abstract here.
+\textbf{Number of words}: 3985; \textbf{Number of Tables}: 1; \textbf{Number of Figures}: 1
+
+\textbf{Abstract}: Despite the increasingly available phylogenetic hypotheses for multiple taxonomic groups, most of them do not include all species. In phylogenetic ecology, there is still strong demand to have phylogenies with all species in a study included. The existing software tools to graft species to backbone megatrees, however, are mostly limited to a specific taxonomic group such as plants or fishes. Here, I introduce a new user-friendly R package \texttt{rtrees} that can assemble phylogenies from existing or user-provided megatrees. For most common taxonomic groups, users can only provide a vector of species scientific names to get a phylogeny or a set of posterior phylogenies from megatrees. It is my hope that \texttt{rtrees} can provide an easy, flexible, and reliable way to assemble phylogenies from megatrees, facilitating the progress of phylogenetic ecology.
+
+\emph{Keywords}: Pruned phylogeny, Supertree, Phylogenetics, Phylogenetic ecology, Community ecology
 
 \clearpage
 
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
-Here is your introduction. It should describe clearly the rationale for the study being done and the previous work related with the study. It should also tell readers about your specific hypothese/questions being addressed. Citations will be like this (Adair et al. \protect\hyperlink{ref-adair_single-pool_2010}{2010}), or (e.g., Clark and Tilman \protect\hyperlink{ref-clark_loss_2008}{2008}), or (Eriksson and Ehrlén \protect\hyperlink{ref-eriksson_seed_1993}{1993}, Williamson et al. \protect\hyperlink{ref-williamson_dissolved_1999}{1999})
+Phylogenetic trees represent hypotheses about the evolutionary history of species, providing essential context for us to understand a wide range of ecological and evolutionary questions such as trait evolution, species interactions, and community assembly (\protect\hyperlink{ref-faith1992conservation}{Faith 1992}, \protect\hyperlink{ref-webb2002phylogenies}{Webb et al. 2002}, \protect\hyperlink{ref-cavender2009merging}{Cavender-Bares et al. 2009}, \protect\hyperlink{ref-baum2012tree}{Baum and Smith 2012}). With the increasingly available genetic and fossil data as well as the development of theories and software tools, established backbone phylogenies are now available for multiple taxonomic groups (e.g., \protect\hyperlink{ref-jetz2012global}{Jetz et al. 2012}, \protect\hyperlink{ref-hinchliff2015synthesis}{Hinchliff et al. 2015}, \protect\hyperlink{ref-tonini2016fully}{Tonini et al. 2016}, \protect\hyperlink{ref-faurby2018phylacine}{Faurby et al. 2018}, \protect\hyperlink{ref-jetz2018interplay}{Jetz and Pyron 2018}, \protect\hyperlink{ref-rabosky2018inverse}{Rabosky et al. 2018}, \protect\hyperlink{ref-smith2018constructing}{Smith and Brown 2018}, \protect\hyperlink{ref-stein2018global}{Stein et al. 2018}, \protect\hyperlink{ref-upham2019inferring}{Upham et al. 2019}). The increasing availability of phylogenies has advanced multiple fields, with phylogenetic ecology being at the top of the list (\protect\hyperlink{ref-webb2002phylogenies}{Webb et al. 2002}, \protect\hyperlink{ref-cavender2009merging}{Cavender-Bares et al. 2009}, \protect\hyperlink{ref-maclvor2016phylogenetic}{Maclvor et al. 2016}, \protect\hyperlink{ref-swenson2019phylogenetic}{Swenson 2019}).
 
-Here is the second paragraph of the introduction.
+Comprehensive phylogenies with as many of the target species to be included as possible are needed for studies in phylogenetic ecology. However, it is still common that only a fraction of the target species can be found in the available phylogenies for many taxonomic groups becaus of the lack of sequence data. This situation leaves two options for ecologist. The first one is to collaborate with phylogenetists to generate their own phylogenies based on sequence data so that all target species will be included. Such phylogenies were referred as purpose-build phylogenies (\protect\hyperlink{ref-li2019common}{Li et al. 2019}). This option normally requires a large amount of effort to sample sequence data and then to assemble a phylogeny using established methods, which requires specific expertise to being applied appropriately. The second option is to derive their phylogenies from existing large synthetic phylogenies by grafting missing species onto the synthetic phylogenies using taxonomic ranks. Such phylogenies were referred as synthesis-based phylogeny (\protect\hyperlink{ref-li2019common}{Li et al. 2019}), which have been demonstrated to give similar results as those based on purpose-build phylogenies for most questions asked in phylogenetic ecology such as calculating phylogenetic diversity and estimating phylogenetic signal of traits (\protect\hyperlink{ref-swenson2009phylogenetic}{Swenson 2009}, \protect\hyperlink{ref-cadotte2015phylogenetic}{Cadotte 2015}, \protect\hyperlink{ref-li2019common}{Li et al. 2019}).
 
-\hypertarget{methods}{%
-\section{Methods}\label{methods}}
+Several computational tools exist to derive sythesis-based phylogenies. The oldest and most widely used one is phylomatic (\protect\hyperlink{ref-webb2005phylomatic}{Webb and Donoghue 2005}). Since published in 2005, phylomatic has been cited more than 1,000 times and contributed significantly to the development of the field of phylogenetic ecology. Phylomatic was written with C (standalone program) or GNU Awk (online program) and is fast. However, the warning/error messages sometimes are hard for users to understand. Furthermore, the grafting process within phylomatic depends on the node information of the mega-trees; however, phylomatic did not pre-process the mega-trees (at least for user provided ones) and thus only be able to graft species with congeneric in the mega-trees. Phylomatic provided a standalone and an online version. To use its standalone version, users need to have some basic knowledge about the command line (i.e., terminal). Its online service is easier to use. However, it limits the number of target species to be no more than 5,000 and is likely to be discontinoued in the future (it was out of service for a while during 2021). Another recent similar tool is the set of \texttt{S.PhyloMaker}, \texttt{V.PhyloMaker}, and \texttt{V.PhyloMaker2}, a serial of R packages developed by the same group to derive phylogenies for vascular plant species (\protect\hyperlink{ref-jin2019v}{Jin and Qian 2019}). These packages work well but are limited to vascular plants and their package structures and documentations can be improved by following the best practices of R package development (\protect\hyperlink{ref-wickham2015r}{Wickham 2015}). For example, a simple check of the \texttt{V.PhyloMaker} package gave 2 warnings and 4 notes. Both phylomatic and the \texttt{V.PhyloMaker} set of R packages require the users to provide the taxonomic classification (genus and family) of the target species. Another R package \texttt{FishPhyloMaker} was developed recently to derive sythesis-based phylogenies for finned-ray fishes (\protect\hyperlink{ref-nakamura2021fishphylomaker}{Nakamura et al. 2021}) based on the fish tree of life megatree (\protect\hyperlink{ref-rabosky2018inverse}{Rabosky et al. 2018}). Users can simply provide a list of species names and \texttt{FishPhyloMaker} will retrive the taxonomic classification information; when such information cannot be found, users are asked to enter it manually. It also will retrive such information for the tips in the megatree that are in the same genus (if congeneric species exist in the megatree), family (if no congeneric species in the megatree), or order (if no co-family species in the megatree) of the target species with every call of the function. Such a design requires internet access and can be slow.
 
-Here is the method section. You can include equations easily. For inline equations, use \(\text{var}(X) = p(1-p)\). For display equation, use
+What is missing from the tool box of phylogenetic ecologists is a user friendly program that can derive synthesis-based phylogenies for most common taxonomic groups with existing megatrees by taking a species list. If a large set of posterior phylogenies exist for some taxonomic groups, the tool should be able to derive phylogenies from a small number of randomly selected megatrees (e.g., 100) so that uncertainties can be accounted for in the downstream analyses. To fill this gap, I developed an R package named \texttt{rtrees}. With \texttt{rtrees}, users only need to provide a species list to derive phylogeny or phylogenies for taxonomic groups with existing established megatrees, which have been processed and hosted in a separate R data package \texttt{megatrees}. Users can also provide their own megatrees if needed. For species list with over 200 species, a progress bar will show to indicate the percentage of jobs that have been finished. I also provided a shinny app for users who want to derive phylogenies online when the number of missing species is less than 1,000.
 
-\[\text{var}(X) = p(1-p)\]
+\hypertarget{package-installation}{%
+\section{Package installation}\label{package-installation}}
 
-\hypertarget{results}{%
-\subsection{Results}\label{results}}
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{install.packages}\NormalTok{(}\StringTok{\textquotesingle{}rtrees\textquotesingle{}}\NormalTok{, }\AttributeTok{repos =} \StringTok{\textquotesingle{}https://daijiang.r{-}universe.dev\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
-\hypertarget{tables}{%
-\paragraph{Tables}\label{tables}}
+The code above will also install the data package \texttt{megatrees}, which hosts a collection of existing synthetic megatrees for amphibians, birds, fishes, mammals, plants, reptiles, and sharks (see Table \ref{tab:megaTable} for details).
 
-Insert tables by \texttt{kable} in knitr package in R. Then cross-reference it back with: see Table \ref{tab:tableName}.
+\hypertarget{usage-scenarios}{%
+\section{Usage scenarios}\label{usage-scenarios}}
+
+\texttt{rtrees} can be used in the following exemplary scenarios. In all scenarios, we can use the function \texttt{rtrees::get\_tree()} to get the phylogenies. See the examples section for details about its usage.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  We have a list of species, and we want to derive a phylogeny of those species from existing megatrees (i.e., synthetic phylogenies) for our analyses such as estimating phylogenetic signal of species traits, or calculating phylogenetic diversity and investigating phylogenetic structures of communities. For these kinds of analyses, a phylogeny derived from synthetic megatree provides robust results (\protect\hyperlink{ref-li2019common}{Li et al. 2019}).
+\item
+  We have a phylogeny based on sequence data (i.e., a purpose-build phylogeny) and we want to insert more species in the phylogeny, potentially as polytomies with their congeneric or co-family species in the phylogeny because of the lack of sequence data.
+\item
+  We have a phylogeny for the species pool. However, we have species that cannot be identifed at species level with certainty (e.g., \emph{Carex spp}). Such morphological species can be binded into the phylogeny using \texttt{rtrees} so that we don't need to throw them away for the downstream analysis.
+\item
+  We can find a set of existing posterior phylogenies that include all or most of our species. However, there are thousands of such posterior phylogenies in the datasets (e.g., phylogenies provided by VertLife \url{https://vertlife.org/}). For our analyses, we only need a smaller number of randomly selected posterior phylogenies to account for the uncertainty of phylogenetic hypotheses. Previous studies suggested that 100 randomly selected phylogenies is generally enough to capture the uncertainties (\protect\hyperlink{ref-li2018species}{Li et al. 2018}, \protect\hyperlink{ref-nakagawa2019general}{Nakagawa and De Villemereuil 2019}, \protect\hyperlink{ref-upham2019inferring}{Upham et al. 2019}). R data package \texttt{megatrees} can save us time to repeat this download-and-subset process by providing 100 randomly selected posterior phylogenies. R package \texttt{rtrees} will use these 100 randomly selected phylogenies to derive 100 phylogenies for the species list we have.
+\end{enumerate}
+
+\hypertarget{shinny-app-for-a-small-number-of-species}{%
+\section{Shinny app for a small number of species}\label{shinny-app-for-a-small-number-of-species}}
+
+I have also developed a shinny app (\url{https://djli.shinyapps.io/rtrees_shiny/}) to get phylogenies when the number of missing species is small (\textless{} 1,000). The main usage scenario of this shinny app is when we want to quickly get a phylogeny or phylogenies for a small number of species without using R. Another main reason to have this limit of 1,000 is because I cannot afford the paid plans provided by the shinny hosting site. When the number of missing species is over 1,000, we should use the R package instead.
+
+\hypertarget{package-strcture}{%
+\section{Package Strcture}\label{package-strcture}}
+
+\hypertarget{classification-information}{%
+\subsection{Classification information}\label{classification-information}}
+
+The taxonomic classification information (e.g., genus and family of each species) is critical for the pre-process of megatrees (see below) and to determine where a new species should be grafted onto a megatree. Therefore, \texttt{rtrees} provides such information in the R object \texttt{rtrees::classifications} for common taxonomic groups. In the current version of \texttt{rtrees} (v0.0.2), the object \texttt{rtrees::classifications} includes 24,222 unique genus of plants, 4,833 unique genus of fishes, 2,508 unique genus of birds, 1,419 unique genus of mammals, 1,237 unique genus of reptiles, 543 unique genus of amphibians, and 198 unique genus of sharks, rays, and chimaeras. I did not include classification information above the family level (e.g., order) because grafting species above family level may bring too much uncertainties.
+
+For plants, I extracted genus and family information from multiple sources, including \href{http://www.theplantlist.org/}{the Plant List} (superseded by the World Flora Online), the World Flora Online, the Plant of World Online, and Catelogue of Life 2019. When different sources give different family information for the same genus, I used the information provided by the Plant of World Online. For fish, I used the taxonomic information provided by the fish tree of life (\protect\hyperlink{ref-rabosky2018inverse}{Rabosky et al. 2018}). Jetz et al. (\protect\hyperlink{ref-jetz2012global}{2012}) build the bird phylogenies based on the Handbook of the Birds of the World (HBW) and BirdLife International digital checklist version 3 and later updated the taxonomy based on version 5. I downloaded the bird taxonomy from Birdtree.org. Mammal taxonomy information are from two sources: PHYLACINE 1.2 (\protect\hyperlink{ref-faurby2018phylacine}{Faurby et al. 2018}) and the mammal diversity database of VertLife (\protect\hyperlink{ref-upham2019inferring}{Upham et al. 2019}). For genus with different family information from these two sources, I used the information provided by the VertLife. Taxonomy information for amphibians, reptiles, sharks, rays, and chimaeras were all provided by the Vertlife (\url{https://vertlife.org/}).
+
+\hypertarget{sources-and-preparation-of-megatrees}{%
+\subsection{Sources and preparation of megatrees}\label{sources-and-preparation-of-megatrees}}
+
+Sources of exisiting megatrees for different taxonomic groups were described in Table \ref{tab:megaTable}. For taxonomic groups with multiple posterior phylogenies, a subset of phylogenies (100 for taxonomic groups except fish, see the column of \texttt{\#\ of\ trees} in Table \ref{tab:megaTable}) were randomly selected. For most analyses, 50-100 randomly selected posterior phylogenies are enough to account for the uncertainties in phylogenetic spaces (\protect\hyperlink{ref-li2018species}{Li et al. 2018}, \protect\hyperlink{ref-nakagawa2019general}{Nakagawa and De Villemereuil 2019}, \protect\hyperlink{ref-upham2019inferring}{Upham et al. 2019}). All megatrees were stored in the \texttt{megatrees} R data package with class of \texttt{phylo} or \texttt{multiPhylo}, the most common data structures of phylogenies used in R.
 
 
 
-\begin{table}[H]
+\begin{table}
 
-\caption{\label{tab:tableName}\textbf{Model coefficients of leaf senescence based on in situ data}. No space at the end of this line!!}
+\caption{\label{tab:megaTable}Brief information about the megatrees included in the \texttt{megatrees} package, which will be installed automatically when \texttt{rtrees} was installed.}
 \centering
-\begin{tabular}[t]{rr}
+\resizebox{\linewidth}{!}{
+\begin{tabular}[t]{llrll}
 \toprule
-Plot & sprich\\
+Taxon & \# of species & \# of trees & R object & Reference\\
 \midrule
-\cellcolor{gray!6}{3294} & \cellcolor{gray!6}{31}\\
-3297 & 28\\
-\cellcolor{gray!6}{3299} & \cellcolor{gray!6}{26}\\
-3330 & 27\\
+\cellcolor{gray!6}{Amphibian} & \cellcolor{gray!6}{7,238} & \cellcolor{gray!6}{100} & \cellcolor{gray!6}{tree\_amphibian\_n100} & \cellcolor{gray!6}{Jetz and Pyron 2018}\\
+Bird & 9,993 & 100 & tree\_bird\_n100 & Jetz et al. 2012\\
+\cellcolor{gray!6}{Fish} & \cellcolor{gray!6}{11,638} & \cellcolor{gray!6}{1} & \cellcolor{gray!6}{tree\_fish\_12k} & \cellcolor{gray!6}{Rabosky et al. 2018}\\
+ & 31,516 & 50 & tree\_fish\_32k\_n50 & Rabosky et al. 2018\\
+\cellcolor{gray!6}{Mammal} & \cellcolor{gray!6}{5,831} & \cellcolor{gray!6}{100} & \cellcolor{gray!6}{tree\_mammal\_n100\_phylacine} & \cellcolor{gray!6}{Faurby et al. 2018}\\
+\addlinespace
+ & 5,911 & 100 & tree\_mammal\_n100\_vertlife & Upham et al. 2019\\
+\cellcolor{gray!6}{Plant} & \cellcolor{gray!6}{74,531} & \cellcolor{gray!6}{1} & \cellcolor{gray!6}{tree\_plant\_otl} & \cellcolor{gray!6}{Smith and Brown 2018}\\
+Reptile (Squamate) & 9,755 & 100 & tree\_reptile\_n100 & Tonini et al. 2016\\
+\cellcolor{gray!6}{Shark, Ray, and Chimaera} & \cellcolor{gray!6}{1,192} & \cellcolor{gray!6}{100} & \cellcolor{gray!6}{tree\_shark\_ray\_n100} & \cellcolor{gray!6}{Stein et al. 2018}\\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
-Put results inline, e.g.~the mean species richness is 28.
+Each megatree was processed so that the most recent common ancestors (MRCA) of all the genus and family in the megatrees are determined using the function \texttt{rtrees::add\_root\_info()}. If a genus or a family is not monophyletic, I used the most inclusive MRCA for that genus or family. The MRCA information of each megatree was saved as an extra component named as \texttt{genus\_family\_root} in the corresponding R object (see Table \ref{tab:megaTable}; e.g., \texttt{tree\_plant\_otl\$genus\_family\_root}). The function \texttt{rtrees::add\_root\_info()} will also be used by \texttt{rtrees::get\_tree()} to process user-provided megatrees.
 
-\hypertarget{insert-tables-by-xtable-package-in-r}{%
-\paragraph{\texorpdfstring{Insert tables by \texttt{xtable} package in R}{Insert tables by xtable package in R}}\label{insert-tables-by-xtable-package-in-r}}
+\hypertarget{species-names-processing}{%
+\subsection{Species names processing}\label{species-names-processing}}
 
-Show as Table. \ref{t:anova}:
+R package \texttt{rtrees} does not provide functions to standardize taxonomic names because exisiting packages such as \texttt{taxize} already provide such features. Users should use such exisiting tools to standardize their species names first, ideally using the same taxonomy backbone as the corresponding megatrees described in Table \ref{tab:megaTable}. When users provide a list of standardized species without information about genus and family (can be a character vector or a data frame with one column named as `species'), function \texttt{rtrees::get\_tree()} will automatically call function \texttt{rtrees::sp\_list\_df()} to use the classification information described above to extract the genus and family information needed for binding missing species to the megatrees if the taxonomic group is one of those in Table \ref{tab:megaTable}. Note that if all genus of the species list are already in the megatrees, no classification information will be needed to finish the binding process. Users can also pass prepared classification information to \texttt{rtrees::get\_tree()}. To do so, the input data frame should have at least three columns: \texttt{species}, \texttt{genus}, and \texttt{family}. Two extra optional columns (\texttt{close\_sp} and \texttt{close\_genus}) can also be included in the input data frame to specify where the target species should be grafted into the megatrees. If users provided the classification and/or location information, \texttt{rtrees} will honor the user provided information (see examples below).
 
-\begin{table}[ht]
-\centering
-\caption{Caption here} 
-\label{t:anova}
-\begin{tabular}{lrrrrr}
-  \toprule
- & Df & Sum Sq & Mean Sq & F value & Pr($>$F) \\ 
-  \midrule
-pH          & 1 & 4.58 & 4.58 & 4.77 & 0.2733 \\ 
-  shade       & 1 & 8.45 & 8.45 & 8.80 & 0.2070 \\ 
-  Residuals   & 1 & 0.96 & 0.96 &  &  \\ 
-   \bottomrule
-\end{tabular}
-\end{table}
+\hypertarget{the-binding-process}{%
+\subsection{The binding process}\label{the-binding-process}}
 
-\hypertarget{insert-tables-by-hand}{%
-\paragraph{Insert tables by hand}\label{insert-tables-by-hand}}
+Once the megatrees were processed and the classification information of species were ready, the binding process begins. If all species are already present in the megatrees, no binding will be needed and a prunned phylogeny will be returned. Otherwise, for species that are missing from the megatrees, \texttt{rtrees} will first look for congeneric species in the megatrees. If no congeneric species was found in the megatrees, \texttt{rtrees} will then look for co-family species in the megatrees. If neither congeneric nor co-family species were found, the target species will be skipped and will be included in the output message with other skipped target species. If either congeneric or co-family species were found in the megatrees, users have three options to bind the target species into the megatrees by setting the \texttt{scenario} argument within \texttt{rtrees::get\_tree()}:
 
-Show as Table. \ref{tab:byhand}:
+\begin{itemize}
+\tightlist
+\item
+  The default way is to bind the missing target species as a polytomy at the basal node of the MRCA of the genus or family in the megatrees (scenario = ``at\_basal\_node''); if the megatrees have only one species in the that genus or family, then the missing target species will be inserted to the half of this only species' branch length.
+\item
+  If users set \texttt{scenario} to be ``random\_below\_basal'', a randomly selected node within the genus or family will be used to bind the missing target species; the probability of a node been selected is proportional to its branch length. Because of the randomness involved with this option, users may want to run this option multiple time (e.g., 50-100) to generate a set of phylogenies.
+\item
+  If users set \texttt{scenario} to be ``at\_or\_above\_basal'', then the missing target species will be binded to the basal node of the same genus or to a new node above the basal node of the family if no congeneric species were found in the megatrees. If the age of the family's basal node is less than 2/3 of the node above it (root node of the family), the missing target species will be binded so that its age will be 2/3 of the root node of the family. Otherwise, the missing target species will be inserted into the middle point of the basal node and the root node of the family. When using the phylogenies derived with this option to calculate community phylogenetic diversity, the results may be inflated (the most among these three scenarios).
+\end{itemize}
 
-\begin{longtable}[]{@{}llll@{}}
-\caption{\label{tab:byhand} Caption here.}\tabularnewline
-\toprule
-Col A & Col B & Col C & Col D\tabularnewline
-\midrule
-\endfirsthead
-\toprule
-Col A & Col B & Col C & Col D\tabularnewline
-\midrule
-\endhead
-row 1 & 190 & \(112 \pm 2\) & \(233 \pm 3\)\tabularnewline
-\(\eta\) & 0.13 & 0.12 & 0.12\tabularnewline
-\(\eta^2\) & 0.14 & 0.13 & 0.50\tabularnewline
-\(\eta^3\) & 0.15 & 0.31 & 0.52\tabularnewline
-\bottomrule
-\end{longtable}
+By default, if the number of missing target species is over 200, a progress bar will be shown in the console. Once the binding process is finished, the megatrees will be pruned to only keep the target species. The generated phylogeny will then be ladderized with R function \texttt{ape::ladderize()}. When there is only one megatree used, the generated phylogeny will have a class of `phylo'; when multiple posterior megatrees were used, the generated phylogenies will have a class of `multiPhylo'. When \texttt{show\_grafted} is set to \texttt{TRUE} (default is \texttt{FALSE}) within \texttt{rtrees::get\_tree()}, binded species will be indicated with trailing \texttt{*} or \texttt{**} in the tip labels of the generated phylogeny, indicating that a species was binded at the genus and family level, respectively. If such information is important for downstream analyses, users can extract such information as its own data frame using \texttt{rtrees::get\_graft\_status()}. Users can use \texttt{rtrees::rm\_stars()} to remove all trailing stars from the tip labels of the generated phylogeny.
 
-\hypertarget{figures}{%
-\paragraph{Figures}\label{figures}}
+\hypertarget{main-functions-and-example-applications}{%
+\subsection{Main functions and example applications}\label{main-functions-and-example-applications}}
 
-Insert figure by code chunk. And cross-ref it back as Figure \ref{fig:figName}.
+In this section, I provide exemplary code to deal with the different situations described in the Usage scenarios section above. The main function to use is \texttt{rtrees::get\_tree()}. Users can type \texttt{?rtrees::get\_tree} in the R console to see details.
 
+For the first scenario described in the Usage scenarios section above (i.e., to get a phylogeny for a list of species using an existing synthetic megatree), we can use the following code:
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# create a species list}
+\NormalTok{species }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}Meliosma laui\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Acer cordatum\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Fraxinus mandshurica\textquotesingle{}}\NormalTok{,}
+            \StringTok{\textquotesingle{}Ormosia pinnata\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Aglaia dasyclada\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Sphagnum\_subnitens\textquotesingle{}}\NormalTok{,}
+            \StringTok{\textquotesingle{}Stephanomeria\_cichoriacea\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Taraxacum\_schroeterianum\textquotesingle{}}\NormalTok{, }
+            \StringTok{\textquotesingle{}Humiria\_balsamifera\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Salix\_cinerea\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Floerkea\_proserpinacoides\textquotesingle{}}\NormalTok{)}
+\CommentTok{\# get a phylogeny}
+\NormalTok{sp\_tree }\OtherTok{\textless{}{-}}\NormalTok{ rtrees}\SpecialCharTok{::}\FunctionTok{get\_tree}\NormalTok{(}\AttributeTok{sp\_list =}\NormalTok{ species, }\AttributeTok{taxon =} \StringTok{\textquotesingle{}plant\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{verbatim}
-## `geom_smooth()` using formula 'y ~ x'
+## 
+## 5 species added at genus level (*)
 \end{verbatim}
 
+\begin{verbatim}
+## 1 species added at family level (**)
+\end{verbatim}
+
+\begin{verbatim}
+## 1 species have no co-family species in the mega-tree, skipped
+## (if you know their family, prepare and edit species list with `rtrees::sp_list_df()` may help): 
+## Sphagnum_subnitens
+\end{verbatim}
+
+In the code chunk above, the vector of species names can have either space or underscore in the names; spaces will be replaced by underscores internally within \texttt{rtrees::get\_tree()}. If no megatree was set by the \texttt{tree\ =} argument, then the \texttt{taxon\ =} argument must be one of the supported taxonomic groups (``amphibian'', ``bird'', ``fish'', ``mammal'', ``plant'', ``reptile'', and ``shark\_ray''). Function \texttt{rtrees::get\_tree()} will print out messages about the number of species been grafted at genus and family level as well as the number of species been skipped if neither congeneric nor co-family species were found in the megatree. In the example above, the skipped species is a moss and the megatree does not have any moss species from the Sphagnaceae family. When the argument \texttt{show\_grafted} of \texttt{rtrees::get\_tree()} is set to `TRUE' (default is `FALSE'), the tip labels of the generated phylogeny will have a trailing * if it is grafted at genus level or ** if it is grafted at family level. No matter whether \texttt{show\_grafted} is `TRUE' or `FALSE', the grafting information was saved along with the phylogeny and can be extracted with the following code:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# or use rtrees::get\_graft\_status()}
+\NormalTok{sp\_tree}\SpecialCharTok{$}\NormalTok{graft\_status}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 11 x 3
+##    tip_label                 species                   status                           
+##    <chr>                     <chr>                     <chr>                            
+##  1 Taraxacum_schroeterianum  Taraxacum_schroeterianum  exisiting species in the megatree
+##  2 Stephanomeria_cichoriacea Stephanomeria_cichoriacea exisiting species in the megatree
+##  3 Fraxinus_mandshurica      Fraxinus_mandshurica      grafted at genus level           
+##  4 Ormosia_pinnata           Ormosia_pinnata           grafted at genus level           
+##  5 Salix_cinerea             Salix_cinerea             exisiting species in the megatree
+##  6 Humiria_balsamifera       Humiria_balsamifera       exisiting species in the megatree
+##  7 Floerkea_proserpinacoides Floerkea_proserpinacoides grafted at family level          
+##  8 Aglaia_dasyclada          Aglaia_dasyclada          grafted at genus level           
+##  9 Acer_cordatum             Acer_cordatum             grafted at genus level           
+## 10 Meliosma_laui             Meliosma_laui             grafted at genus level           
+## 11 <NA>                      Sphagnum_subnitens        skipped as no co-family in the m~
+\end{verbatim}
+
+When users already have a phylogeny for most of their species (i.e., the second and third scenarios described in the Usage scenarios section above), we can use the same code as above, with the argument \texttt{tree\_by\_user\ =\ TRUE}. And here is an example using the phylogeny generated above as a pretended megatree that we already have.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{more\_sp\_to\_add }\OtherTok{=} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}Ormosia\_sp.\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Fraxinus\_americana\textquotesingle{}}\NormalTok{)}
+\NormalTok{new\_species }\OtherTok{=} \FunctionTok{c}\NormalTok{(species, more\_sp\_to\_add)}
+\NormalTok{sp\_tree\_2 }\OtherTok{=}\NormalTok{ rtrees}\SpecialCharTok{::}\FunctionTok{get\_tree}\NormalTok{(}\AttributeTok{sp\_list =}\NormalTok{ new\_species, }\AttributeTok{tree =}\NormalTok{ sp\_tree, }
+                             \AttributeTok{taxon =} \StringTok{\textquotesingle{}plant\textquotesingle{}}\NormalTok{, }\AttributeTok{tree\_by\_user =} \ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Not all genus can be found in the phylogeny.
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## 2 species added at genus level (*)
+\end{verbatim}
+
+\begin{verbatim}
+## 1 species have no co-family species in the mega-tree, skipped
+## (if you know their family, prepare and edit species list with `rtrees::sp_list_df()` may help): 
+## Sphagnum_subnitens
+\end{verbatim}
+
+In the code above, as there is a genus (Sphagnum) not included in the user provided phylogeny, we need to specify the \texttt{taxon} argument to extract the correct classification information; note that this requires the taxonomic group is one of those supported by \texttt{rtrees} (Table \ref{tab:megaTable}). However, if all genus of the species list are already in the user provided phylogeny, then we can ignore the \texttt{taxon} argument:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# remove Sphagnum\_subnitens so that all genus are in the megatree}
+\NormalTok{new\_species\_all\_in }\OtherTok{=} \FunctionTok{setdiff}\NormalTok{(new\_species, }\StringTok{\textquotesingle{}Sphagnum\_subnitens\textquotesingle{}}\NormalTok{)}
+\NormalTok{sp\_tree\_3 }\OtherTok{=}\NormalTok{ rtrees}\SpecialCharTok{::}\FunctionTok{get\_tree}\NormalTok{(}\AttributeTok{sp\_list =}\NormalTok{ new\_species\_all\_in, }\AttributeTok{tree =}\NormalTok{ sp\_tree, }
+                             \AttributeTok{tree\_by\_user =} \ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## 2 species added at genus level (*)
+\end{verbatim}
+
+The function \texttt{rtrees::get\_tree()} can also work with a set of posterior megatrees (the fourth scenario in the Usage scenarios section) with the option to use parallel computing for the whole process. The default number of cores to be used will be the available number of cores minus 2 (so that users can still perform other tasks on their computers at the same time). The output will be a set of generated phylogenies with class `multiPhylo'; the number of derived phylogenies will be the same as the input megatrees. For this scenario, we can use exactly the same code described above.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# bird species}
+\NormalTok{bird\_species }\OtherTok{=}  \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}Brachypteryx\_major\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Asthenes\_perijana\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Ciridops\_anna\textquotesingle{}}\NormalTok{, }
+                   \StringTok{\textquotesingle{}Leiothlypis\_ruficapilla\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Reinwardtoena\_reinwardti\textquotesingle{}}\NormalTok{,}
+                   \StringTok{\textquotesingle{}Garrulax\_caerulatus\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Buteo\_rufofuscus\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Sylvia\_mystacea\textquotesingle{}}\NormalTok{,}
+                   \StringTok{\textquotesingle{}Telophorus\_viridis\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Trachyphonus\_darnaudii\textquotesingle{}}\NormalTok{)}
+\NormalTok{sp\_tree\_4 }\OtherTok{=}\NormalTok{ rtrees}\SpecialCharTok{::}\FunctionTok{get\_tree}\NormalTok{(}\AttributeTok{sp\_list =}\NormalTok{ bird\_species, }\AttributeTok{taxon =} \StringTok{\textquotesingle{}bird\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## 3 species added at genus level (*)
+\end{verbatim}
+
+\begin{verbatim}
+## 2 species added at family level (**)
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sp\_tree\_4}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 100 phylogenetic trees
+\end{verbatim}
+
+\hypertarget{performance}{%
+\subsection{Performance}\label{performance}}
+
+The R package \texttt{rtrees} is a user friendly tool to assemble phylogenies from existing or user provided megatrees despite that it is not as fast as \texttt{phylomatic} (\protect\hyperlink{ref-webb2005phylomatic}{Webb and Donoghue 2005}), which was written in C. However, \texttt{phylomatic} can give very uninformative error messages in most cases that I have used it. For example, messages below would make it really hard to debug:
+
+\begin{verbatim}
+Error: Program 'phylomatic' terminated by SIGNAL (Segmentation fault: 11)
+
+bad CPU type in executable: phylomatic
+\end{verbatim}
+
+I tried to compare the speed of \texttt{rtrees} and \texttt{phylomatic} but was not able to run \texttt{phylomatic} with the large megatrees prepared here after multiple attempts. On the other hand, I was able to compare the performance of \texttt{rtrees} and \texttt{V.PhyloMaker}. In most cases, \texttt{rtrees} is at least two times faster than \texttt{V.PhyloMaker} (Fig. \ref{fig:figSpeed}). For example, with 50 missing species to bind, the average time used by \texttt{rtrees} is 0.914 second while \texttt{V.PhyloMaker} took 13.6 seconds on average; with 5,000 missing species to bind, \texttt{rtrees} used 80.9 seconds on average while \texttt{V.PhyloMaker} used 187 seconds. In general, the time used by \texttt{rtrees} and \texttt{V.PhyloMaker} increased 15.6 and 34.8 seconds on average with 1,000 more missing species to be grafted, respectively. All tests were conducted on a 14' Macbook Pro with M1 pro chip.
+
+
+
 \begin{figure}[H]
 
-{\centering \includegraphics{ms_files/figure-latex/figName-1} 
+{\centering \includegraphics{ms_files/figure-latex/figSpeed-1} 
 
 }
 
-\caption{\textbf{No - or \_ in the caption ref.} No space at the end of this line!}\label{fig:figName}
+\caption{Performance comparisons between \texttt{rtrees} and \texttt{V.PhyloMaker}. For each test, five replications were conducted using both the \texttt{rtrees} and \texttt{V.PhyloMaker} R package.}\label{fig:figSpeed}
 \end{figure}
 
-Or if you already have the figure:
+I did not compare the performance between \texttt{rtrees} and \texttt{FishPhyloMaker} here because the later' design to process the fish megatree (e.g., find MRCA for clades) every time whenever we use it makes it really slow. For example, to bind 500 missing fish species, \texttt{FishPhyloMaker} took almost 8 minutes while \texttt{rtrees} used only 4 seconds.
 
-And cite it as Figure \ref{fig:fig2}.
+\hypertarget{discussion}{%
+\section{Discussion}\label{discussion}}
 
+Based on Fig. \ref{fig:figSpeed}, the time used by \texttt{rtrees} (and other R packages such as \texttt{V.PhyloMaker} and \texttt{FishPhyloMaker}) increased linearly with the number of missing species. This is because of the sequential structure of the R \texttt{phylo} object (\protect\hyperlink{ref-paradis2004ape}{Paradis et al. 2004}), in which all tips and nodes of a phylogeny are labeled with continoued integers. When a new node or tip needs to be inserted, all the numbers after the binding location need to be pushed one place after. Therefore, the binding of tips in an R \texttt{phylo} object is a sequential process, which cannot be conducted with parallel computing to take advantage of the multiple CPU cores a regular computer has nowadays. It is possible to speed it up by converting some core R code into C++. However, it takes a lot of effort to do this right while I don't have extensive knowledge of C++. Another potential resolution is to represent phylogenies in a non-sequential structure unlike \texttt{phylo} objects in R. One example is the \texttt{mantree} package (\protect\hyperlink{ref-bennett2017treeman}{Bennett et al. 2017}), which developed such a structure to perform tree manipulations. Because of the non-sequential structure (i.e., no continous labeling of nodes and tips), it is possible to use parallel computing to process phylogenies. However, such a structure has not yet been adapted widely by the R community. Since the publication of the original paper (\protect\hyperlink{ref-bennett2017treeman}{Bennett et al. 2017}) in 2017, it has been cited for only 17 times by October 2022 based on Google Scholar (by contrast, R package \texttt{ape} has been cited over 11,100 times since 2004). Therefore, the infrastructure to support such a non-sequential structure in R is still missing, making it hard to use it here in \texttt{rtrees}. Despite the limitations described above, \texttt{rtrees} is reasonably fast and user friendly with informative messages. The R package \texttt{rtrees} is also the only R package that can generate phylogenies for multiple taxonomic groups (Table \ref{tab:megaTable}) without much effort from the user side. Other packages such as \texttt{V.PhyloMaker} and \texttt{phylomatic} can do this in theory (as claimed by authors in their papers) (\protect\hyperlink{ref-webb2005phylomatic}{Webb and Donoghue 2005}, \protect\hyperlink{ref-jin2019v}{Jin and Qian 2019}); however, users need to figure out how to do it by themselves.
 
+With the recent advances in phylogenetics of multiple taxonomic groups, more megatrees will be available in the near future (e.g., Lepidoptera (\protect\hyperlink{ref-kawahara2019phylogenomics}{Kawahara et al. 2019})). It is relatively easy to include more megatrees beyond those described in Table \ref{tab:megaTable} as the R package \texttt{rtrees} was designed with expandibility in mind. We only need to do two things to include a new megatree. First, the new megatree will be processed with the function \texttt{rtrees::add\_root\_info()} and will be stored in the R data package \texttt{megatrees}, which is a dependency of \texttt{rtrees}. Second, the classification information (genus and family) will be saved within \texttt{rtrees} if it is a new taxonomic group. No further change will be needed for other components of \texttt{rtrees}.
 
-\begin{figure}[H]
+It is my hope that \texttt{rtrees} will make it much easier to derive phylogenies from existing megatrees for all common taxonomic groups. Such synthesis-based phylogenies are reliable for most ecological questions such as calculating phylogenetic diversity and estimating phylogenetic signals (\protect\hyperlink{ref-li2019common}{Li et al. 2019}). Note that such phylogenies may not be suitable for evolutionary studies such as estimating diversification rates if a large proportion of missing species were included in the derived phylogenies. Therefore, it is also my hope that \texttt{rtrees} will facilitate research in phylogenetic ecology. I am committed to maintain and update \texttt{rtrees} in the foreseeable future. Since \texttt{rtrees} is an open source software, others are more than welcome to contribute by submitting pull requests or openning issues to the GitHub repository (\url{https://github.com/daijiang/rtrees}).
 
-{\centering \includegraphics[width=0.7\linewidth,]{/Users/dli/github/workflow_demo/Figs/plot} 
+\hypertarget{data-and-code-availability}{%
+\section{Data and code availability}\label{data-and-code-availability}}
 
-}
+No empirical data were used in this paper. The code used for the performance tests can be found in the GitHub repository of this paper (\url{https://github.com/daijiang/rtrees_ms}).
 
-\caption{\textbf{No - or \_ in the caption ref.} No space at the end of this line!}\label{fig:fig2}
-\end{figure}
+\hypertarget{acknowledgement}{%
+\section{Acknowledgement}\label{acknowledgement}}
 
-More details can be found at \href{https://bookdown.org/yihui/bookdown/}{here}.
+This study was partly supported by NSF grant DEB \#2213567. I thank Harroop Bedi for his contribution on developing the prototype of the \texttt{rtrees} shinny app through the REU program at the Center of Computation \& Techology at the Louisiana State University supported by NSF grant OAC \#1852454.
 
 \hypertarget{references}{%
-\section{References}\label{references}}
+\section*{References}\label{references}}
+\addcontentsline{toc}{section}{References}
 
 \hypertarget{refs}{}
-\begin{cslreferences}
-\leavevmode\hypertarget{ref-adair_single-pool_2010}{}%
-Adair, E. C., S. E. Hobbie, and R. K. Hobbie. 2010. Single-pool exponential decomposition models: Potential pitfalls in their use in ecological studies. Ecology 91:1225--1236.
+\begin{CSLReferences}{1}{0}
+\leavevmode\vadjust pre{\hypertarget{ref-baum2012tree}{}}%
+Baum, D. A., and S. D. Smith. 2012. Tree thinking: An introduction to phylogenetic biology. Roberts; Co., Greenwood Village, CO.
 
-\leavevmode\hypertarget{ref-clark_loss_2008}{}%
-Clark, C. M., and D. Tilman. 2008. Loss of plant species after chronic low-level nitrogen deposition to prairie grasslands. Nature 451:712--715.
+\leavevmode\vadjust pre{\hypertarget{ref-bennett2017treeman}{}}%
+Bennett, D. J., M. D. Sutton, and S. T. Turvey. 2017. Treeman: An r package for efficient and intuitive manipulation of phylogenetic trees. BMC research notes 10:1--10.
 
-\leavevmode\hypertarget{ref-eriksson_seed_1993}{}%
-Eriksson, O., and J. Ehrlén. 1993. Seed and microsite limitation of recruitment in plant populations. Oecologia 92:361--366.
+\leavevmode\vadjust pre{\hypertarget{ref-cadotte2015phylogenetic}{}}%
+Cadotte, M. W. 2015. Phylogenetic diversity--ecosystem function relationships are insensitive to phylogenetic edge lengths. Functional Ecology 29:718--723.
 
-\leavevmode\hypertarget{ref-williamson_dissolved_1999}{}%
-Williamson, C. E., D. P. Morris, M. L. Pace, and O. G. Olson. 1999. Dissolved organic carbon and nutrients as regulators of lake ecosystems: Resurrection of a more integrated paradigm. Limnology and Oceanography 44:795--803.
-\end{cslreferences}
+\leavevmode\vadjust pre{\hypertarget{ref-cavender2009merging}{}}%
+Cavender-Bares, J., K. H. Kozak, P. V. Fine, and S. W. Kembel. 2009. The merging of community ecology and phylogenetic biology. Ecology letters 12:693--715.
 
-\clearpage
+\leavevmode\vadjust pre{\hypertarget{ref-faith1992conservation}{}}%
+Faith, D. P. 1992. Conservation evaluation and phylogenetic diversity. Biological conservation 61:1--10.
 
-\setcounter{page}{0}
-\pagenumbering{arabic}
-\setcounter{page}{1}
+\leavevmode\vadjust pre{\hypertarget{ref-faurby2018phylacine}{}}%
+Faurby, S., M. Davis, R. Ø. Pedersen, S. D. Schowanek, A. Antonelli, and J.-C. Svenning. 2018. PHYLACINE 1.2: The phylogenetic atlas of mammal macroecology. Ecology 99:2626.
 
-\setcounter{figure}{0}
-\setcounter{table}{0}
-\renewcommand {\thetable}{S\arabic{table}}
-\renewcommand {\thefigure}{S\arabic{figure}}
+\leavevmode\vadjust pre{\hypertarget{ref-hinchliff2015synthesis}{}}%
+Hinchliff, C. E., S. A. Smith, J. F. Allman, J. G. Burleigh, R. Chaudhary, L. M. Coghill, K. A. Crandall, J. Deng, B. T. Drew, R. Gazis, and others. 2015. Synthesis of phylogeny and taxonomy into a comprehensive tree of life. Proceedings of the National Academy of Sciences 112:12764--12769.
 
-\hypertarget{supporting-information}{%
-\section{Supporting Information}\label{supporting-information}}
+\leavevmode\vadjust pre{\hypertarget{ref-jetz2018interplay}{}}%
+Jetz, W., and R. A. Pyron. 2018. The interplay of past diversification and evolutionary isolation with present imperilment across the amphibian tree of life. Nature ecology \& evolution 2:850--858.
 
-\hypertarget{figures-1}{%
-\subsection{Figures}\label{figures-1}}
+\leavevmode\vadjust pre{\hypertarget{ref-jetz2012global}{}}%
+Jetz, W., G. Thomas, J. Joy, K. Hartmann, and A. Mooers. 2012. The global diversity of birds in space and time. Nature 491:444--448.
 
+\leavevmode\vadjust pre{\hypertarget{ref-jin2019v}{}}%
+Jin, Y., and H. Qian. 2019. V. PhyloMaker: An r package that can generate very large phylogenies for vascular plants. Ecography 42:1353--1359.
 
+\leavevmode\vadjust pre{\hypertarget{ref-kawahara2019phylogenomics}{}}%
+Kawahara, A. Y., D. Plotkin, M. Espeland, K. Meusemann, E. F. Toussaint, A. Donath, F. Gimnich, P. B. Frandsen, A. Zwick, M. Dos Reis, and others. 2019. Phylogenomics reveals the evolutionary timing and pattern of butterflies and moths. Proceedings of the National Academy of Sciences 116:22657--22663.
 
-\begin{figure}[H]
+\leavevmode\vadjust pre{\hypertarget{ref-li2018species}{}}%
+Li, D., W. B. Monahan, and B. Baiser. 2018. Species richness and phylogenetic diversity of native and non-native species respond differently to area and environmental factors. Diversity and Distributions 24:853--864.
 
-{\centering \includegraphics[width=0.7\linewidth,]{/Users/dli/github/workflow_demo/Figs/plot} 
+\leavevmode\vadjust pre{\hypertarget{ref-li2019common}{}}%
+Li, D., L. Trotta, H. E. Marx, J. M. Allen, M. Sun, D. E. Soltis, P. S. Soltis, R. P. Guralnick, and B. Baiser. 2019. For common community phylogenetic analyses, go ahead and use synthesis phylogenies. Ecology 100:e02788.
 
-}
+\leavevmode\vadjust pre{\hypertarget{ref-maclvor2016phylogenetic}{}}%
+Maclvor, J. S., J. S. Macivor, M. W. Cadotte, S. W. Livingstone, J. T. Lundholm, and S.-L. E. Yasui. 2016. Phylogenetic ecology and the greening of cities. Journal of Applied Ecology:1470--1476.
 
-\caption{\textbf{No - or \_ in the caption ref.} No space at the end of this line!}\label{fig:figS1}
-\end{figure}
+\leavevmode\vadjust pre{\hypertarget{ref-nakagawa2019general}{}}%
+Nakagawa, S., and P. De Villemereuil. 2019. A general method for simultaneously accounting for phylogenetic and species sampling uncertainty via rubin's rules in comparative analysis. Systematic Biology 68:632--641.
+
+\leavevmode\vadjust pre{\hypertarget{ref-nakamura2021fishphylomaker}{}}%
+Nakamura, G., A. Richter, and B. E. Soares. 2021. FishPhyloMaker: An r package to generate phylogenies for ray-finned fishes. Ecological Informatics 66:101481.
+
+\leavevmode\vadjust pre{\hypertarget{ref-paradis2004ape}{}}%
+Paradis, E., J. Claude, and K. Strimmer. 2004. APE: Analyses of phylogenetics and evolution in r language. Bioinformatics 20:289--290.
+
+\leavevmode\vadjust pre{\hypertarget{ref-rabosky2018inverse}{}}%
+Rabosky, D. L., J. Chang, P. F. Cowman, L. Sallan, M. Friedman, K. Kaschner, C. Garilao, T. J. Near, M. Coll, M. E. Alfaro, and others. 2018. An inverse latitudinal gradient in speciation rate for marine fishes. Nature 559:392--395.
+
+\leavevmode\vadjust pre{\hypertarget{ref-smith2018constructing}{}}%
+Smith, S. A., and J. W. Brown. 2018. Constructing a broadly inclusive seed plant phylogeny. American journal of botany 105:302--314.
+
+\leavevmode\vadjust pre{\hypertarget{ref-stein2018global}{}}%
+Stein, R. W., C. G. Mull, T. S. Kuhn, N. C. Aschliman, L. N. Davidson, J. B. Joy, G. J. Smith, N. K. Dulvy, and A. O. Mooers. 2018. Global priorities for conserving the evolutionary history of sharks, rays and chimaeras. Nature ecology \& evolution 2:288--298.
+
+\leavevmode\vadjust pre{\hypertarget{ref-swenson2009phylogenetic}{}}%
+Swenson, N. G. 2009. Phylogenetic resolution and quantifying the phylogenetic diversity and dispersion of communities. PloS one 4:e4390.
+
+\leavevmode\vadjust pre{\hypertarget{ref-swenson2019phylogenetic}{}}%
+Swenson, N. G. 2019. Phylogenetic ecology: A history, critique, and remodeling. University of Chicago Press.
+
+\leavevmode\vadjust pre{\hypertarget{ref-tonini2016fully}{}}%
+Tonini, J. F. R., K. H. Beard, R. B. Ferreira, W. Jetz, and R. A. Pyron. 2016. Fully-sampled phylogenies of squamates reveal evolutionary patterns in threat status. Biological Conservation 204:23--31.
+
+\leavevmode\vadjust pre{\hypertarget{ref-upham2019inferring}{}}%
+Upham, N. S., J. A. Esselstyn, and W. Jetz. 2019. Inferring the mammal tree: Species-level sets of phylogenies for questions in ecology, evolution, and conservation. PLoS biology 17:e3000494.
+
+\leavevmode\vadjust pre{\hypertarget{ref-webb2002phylogenies}{}}%
+Webb, C. O., D. D. Ackerly, M. A. McPeek, and M. J. Donoghue. 2002. Phylogenies and community ecology. Annual review of ecology and systematics 33:475--505.
+
+\leavevmode\vadjust pre{\hypertarget{ref-webb2005phylomatic}{}}%
+Webb, C. O., and M. J. Donoghue. 2005. Phylomatic: Tree assembly for applied phylogenetics. Molecular Ecology Resources 5:181--183.
+
+\leavevmode\vadjust pre{\hypertarget{ref-wickham2015r}{}}%
+Wickham, H. 2015. R packages: Organize, test, document, and share your code. " O'Reilly Media, Inc.".
+
+\end{CSLReferences}
 
 \end{document}
