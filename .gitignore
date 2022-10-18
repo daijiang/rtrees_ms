@@ -8,6 +8,7 @@
 # rstudio #
 ###########
 .Rproj.user
+.Rhistory
 
 
 # Packages #
