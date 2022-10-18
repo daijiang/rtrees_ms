@@ -609,7 +609,7 @@ pre code {
 
 <h1 class="title toc-ignore">rtrees: an R package to assemble phylogenetic trees from megatrees</h1>
 <h4 class="author">Daijiang Li<sup>1,2</sup>*</h4>
-<h4 class="date">17 October, 2022</h4>
+<h4 class="date">18 October, 2022</h4>
 
 </div>
 
@@ -672,7 +672,7 @@ pre code {
 <h1>Package Strcture</h1>
 <div id="classification-information" class="section level2">
 <h2>Classification information</h2>
-<p>The taxonomic classification information (e.g., genus and family of each species) is critical for the pre-process of megatrees (see below) and to determine where a new species should be grafted onto a megatree. Therefore, <code>rtrees</code> provides such information in the R object <code>rtrees::classifications</code> for common taxonomic groups. In the current version of <code>rtrees</code> (v0.0.2), the object <code>rtrees::classifications</code> includes 24,222 unique genus of plants, 4,833 unique genus of fishes, 2,508 unique genus of birds, 1,419 unique genus of mammals, 1,237 unique genus of reptiles, 543 unique genus of amphibians, and 198 unique genus of sharks, rays, and chimaeras. I did not include classification information above the family level (e.g., order) because grafting species above family level may bring too much uncertainties.</p>
+<p>The taxonomic classification information (e.g., genus and family of each species) is critical for the pre-process of megatrees (see below) and to determine where a new species should be grafted onto a megatree. Therefore, <code>rtrees</code> provides such information in the R object <code>rtrees::classifications</code> for common taxonomic groups. In the current version of <code>rtrees</code> (v1.0.0), the object <code>rtrees::classifications</code> includes 24,222 unique genus of plants, 4,833 unique genus of fishes, 2,508 unique genus of birds, 1,419 unique genus of mammals, 1,237 unique genus of reptiles, 543 unique genus of amphibians, and 198 unique genus of sharks, rays, and chimaeras. I did not include classification information above the family level (e.g., order) because grafting species above family level may bring too much uncertainties.</p>
 <p>For plants, I extracted genus and family information from multiple sources, including <a href="http://www.theplantlist.org/">the Plant List</a> (superseded by the World Flora Online), the World Flora Online, the Plant of World Online, and Catelogue of Life 2019. When different sources give different family information for the same genus, I used the information provided by the Plant of World Online. For fish, I used the taxonomic information provided by the fish tree of life <span class="citation">(<a href="#ref-rabosky2018inverse" role="doc-biblioref">Rabosky et al. 2018</a>)</span>. <span class="citation">Jetz et al. (<a href="#ref-jetz2012global" role="doc-biblioref">2012</a>)</span> build the bird phylogenies based on the Handbook of the Birds of the World (HBW) and BirdLife International digital checklist version 3 and later updated the taxonomy based on version 5. I downloaded the bird taxonomy from Birdtree.org. Mammal taxonomy information are from two sources: PHYLACINE 1.2 <span class="citation">(<a href="#ref-faurby2018phylacine" role="doc-biblioref">Faurby et al. 2018</a>)</span> and the mammal diversity database of VertLife <span class="citation">(<a href="#ref-upham2019inferring" role="doc-biblioref">Upham et al. 2019</a>)</span>. For genus with different family information from these two sources, I used the information provided by the VertLife. Taxonomy information for amphibians, reptiles, sharks, rays, and chimaeras were all provided by the Vertlife (<a href="https://vertlife.org/" class="uri">https://vertlife.org/</a>).</p>
 </div>
 <div id="sources-and-preparation-of-megatrees" class="section level2">
@@ -817,7 +817,7 @@ Plant
 tree_plant_otl
 </td>
 <td style="text-align:left;">
-Smith and Brown 2018
+Smith and Brown 2018; Jin and Quan 2019
 </td>
 </tr>
 <tr>

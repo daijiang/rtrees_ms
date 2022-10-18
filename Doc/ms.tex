@@ -213,7 +213,7 @@
 
 \title{rtrees: an R package to assemble phylogenetic trees from megatrees}
 \author{Daijiang Li\textsuperscript{1,2}*}
-\date{17 October, 2022}
+\date{18 October, 2022}
 
 \begin{document}
 \maketitle
@@ -294,7 +294,7 @@ I have also developed a shinny app (\url{https://djli.shinyapps.io/rtrees_shiny/
 \hypertarget{classification-information}{%
 \subsection{Classification information}\label{classification-information}}
 
-The taxonomic classification information (e.g., genus and family of each species) is critical for the pre-process of megatrees (see below) and to determine where a new species should be grafted onto a megatree. Therefore, \texttt{rtrees} provides such information in the R object \texttt{rtrees::classifications} for common taxonomic groups. In the current version of \texttt{rtrees} (v0.0.2), the object \texttt{rtrees::classifications} includes 24,222 unique genus of plants, 4,833 unique genus of fishes, 2,508 unique genus of birds, 1,419 unique genus of mammals, 1,237 unique genus of reptiles, 543 unique genus of amphibians, and 198 unique genus of sharks, rays, and chimaeras. I did not include classification information above the family level (e.g., order) because grafting species above family level may bring too much uncertainties.
+The taxonomic classification information (e.g., genus and family of each species) is critical for the pre-process of megatrees (see below) and to determine where a new species should be grafted onto a megatree. Therefore, \texttt{rtrees} provides such information in the R object \texttt{rtrees::classifications} for common taxonomic groups. In the current version of \texttt{rtrees} (v1.0.0), the object \texttt{rtrees::classifications} includes 24,222 unique genus of plants, 4,833 unique genus of fishes, 2,508 unique genus of birds, 1,419 unique genus of mammals, 1,237 unique genus of reptiles, 543 unique genus of amphibians, and 198 unique genus of sharks, rays, and chimaeras. I did not include classification information above the family level (e.g., order) because grafting species above family level may bring too much uncertainties.
 
 For plants, I extracted genus and family information from multiple sources, including \href{http://www.theplantlist.org/}{the Plant List} (superseded by the World Flora Online), the World Flora Online, the Plant of World Online, and Catelogue of Life 2019. When different sources give different family information for the same genus, I used the information provided by the Plant of World Online. For fish, I used the taxonomic information provided by the fish tree of life (\protect\hyperlink{ref-rabosky2018inverse}{Rabosky et al. 2018}). Jetz et al. (\protect\hyperlink{ref-jetz2012global}{2012}) build the bird phylogenies based on the Handbook of the Birds of the World (HBW) and BirdLife International digital checklist version 3 and later updated the taxonomy based on version 5. I downloaded the bird taxonomy from Birdtree.org. Mammal taxonomy information are from two sources: PHYLACINE 1.2 (\protect\hyperlink{ref-faurby2018phylacine}{Faurby et al. 2018}) and the mammal diversity database of VertLife (\protect\hyperlink{ref-upham2019inferring}{Upham et al. 2019}). For genus with different family information from these two sources, I used the information provided by the VertLife. Taxonomy information for amphibians, reptiles, sharks, rays, and chimaeras were all provided by the Vertlife (\url{https://vertlife.org/}).
 
@@ -321,7 +321,7 @@ Bird & 9,993 & 100 & tree\_bird\_n100 & Jetz et al. 2012\\
 \cellcolor{gray!6}{Mammal} & \cellcolor{gray!6}{5,831} & \cellcolor{gray!6}{100} & \cellcolor{gray!6}{tree\_mammal\_n100\_phylacine} & \cellcolor{gray!6}{Faurby et al. 2018}\\
 \addlinespace
  & 5,911 & 100 & tree\_mammal\_n100\_vertlife & Upham et al. 2019\\
-\cellcolor{gray!6}{Plant} & \cellcolor{gray!6}{74,531} & \cellcolor{gray!6}{1} & \cellcolor{gray!6}{tree\_plant\_otl} & \cellcolor{gray!6}{Smith and Brown 2018}\\
+\cellcolor{gray!6}{Plant} & \cellcolor{gray!6}{74,531} & \cellcolor{gray!6}{1} & \cellcolor{gray!6}{tree\_plant\_otl} & \cellcolor{gray!6}{Smith and Brown 2018; Jin and Quan 2019}\\
 Reptile (Squamate) & 9,755 & 100 & tree\_reptile\_n100 & Tonini et al. 2016\\
 \cellcolor{gray!6}{Shark, Ray, and Chimaera} & \cellcolor{gray!6}{1,192} & \cellcolor{gray!6}{100} & \cellcolor{gray!6}{tree\_shark\_ray\_n100} & \cellcolor{gray!6}{Stein et al. 2018}\\
 \bottomrule

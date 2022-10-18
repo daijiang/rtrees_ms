@@ -153,7 +153,7 @@ megatable = tibble::tibble(
                  "tree_plant_otl", "tree_reptile_n100", "tree_shark_ray_n100"),
   Reference = c("Jetz and Pyron 2018", "Jetz et al. 2012", "Rabosky et al. 2018",
                 "Rabosky et al. 2018", "Faurby et al. 2018", "Upham et al. 2019",
-                "Smith and Brown 2018", "Tonini et al. 2016", "Stein et al. 2018")
+                "Smith and Brown 2018; Jin and Quan 2019", "Tonini et al. 2016", "Stein et al. 2018")
 )
 knitr::kable(megatable,  booktabs = T, caption = "(ref:megaTable)") |>
  kableExtra::kable_styling(bootstrap_options = c("striped", "scale_down", "condensed", "hover"), 
