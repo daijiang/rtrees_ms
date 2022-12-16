@@ -1,16 +1,6 @@
 ---
 title: "rtrees: an R package to assemble phylogenetic trees from megatrees"
-author: "Daijiang Li^1,2^*"
-date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
-  bookdown::html_document2:
-    number_sections: no
-    theme: readable
-    toc: yes
-  bookdown::word_document2:
-    toc: no
-    reference_docx: template/nature_style.docx
-    number_sections: no
   bookdown::pdf_document2:
     includes:
       before_body: template/doc_prefix.tex
@@ -22,6 +12,14 @@ output:
   bookdown::tufte_html2:
     number_sections: no
     toc: yes
+  bookdown::html_document2:
+    number_sections: no
+    theme: readable
+    toc: yes
+  bookdown::word_document2:
+    toc: no
+    reference_docx: template/nature_style.docx
+    number_sections: no
 fontsize: 12pt
 linestretch: 1.5
 link-citations: yes
@@ -63,15 +61,6 @@ if(knitr::is_latex_output() | knitr::is_html_output()){
 }
 library(rtrees)
 ```
-
-\footnotesize
-
-^1^Department of Biological Sciences, Louisiana State University, Baton Rouge, LA, USA\
-^2^Center for Computation & Technology, Louisiana State University, Baton Rouge, LA, USA
-
-\* **Corresponding author**, email: [daijianglee\@gmail.com](mailto:daijianglee@gmail.com){.email}; 125 Life Science Building, Baton Rouge, LA 70803
-
-\normalsize
 
 **Running headline**: Tool to assemble phylogenetic trees
 
@@ -153,7 +142,7 @@ megatable = tibble::tibble(
                  "tree_plant_otl", "tree_reptile_n100", "tree_shark_ray_n100"),
   Reference = c("Jetz and Pyron 2018", "Jetz et al. 2012", "Rabosky et al. 2018",
                 "Rabosky et al. 2018", "Faurby et al. 2018", "Upham et al. 2019",
-                "Smith and Brown 2018; Jin and Quan 2019", "Tonini et al. 2016", "Stein et al. 2018")
+                "Smith and Brown 2018; Jin and Qian 2019", "Tonini et al. 2016", "Stein et al. 2018")
 )
 knitr::kable(megatable,  booktabs = T, caption = "(ref:megaTable)") |>
  kableExtra::kable_styling(bootstrap_options = c("striped", "scale_down", "condensed", "hover"), 
@@ -286,14 +275,14 @@ With the recent advances in phylogenetics of multiple taxonomic groups, more meg
 
 It is my hope that `rtrees` will make it much easier to derive phylogenies from existing megatrees for all common taxonomic groups. Such synthesis-based phylogenies are reliable for most ecological questions such as calculating phylogenetic diversity and estimating phylogenetic signals [@li2019common]. Note that such phylogenies may not be suitable for evolutionary studies such as estimating diversification rates if a large proportion of missing species were included in the derived phylogenies. Therefore, it is also my hope that `rtrees` will facilitate research in phylogenetic ecology. I am committed to maintain and update `rtrees` in the foreseeable future. Since `rtrees` is an open source software, others are more than welcome to contribute by submitting pull requests or openning issues to the GitHub repository (https://github.com/daijiang/rtrees). 
 
-# Data and code availability
+<!-- # Data and code availability
 
 No empirical data were used in this paper. The code used for the performance tests can be found in the GitHub repository of this paper (https://github.com/daijiang/rtrees_ms).
 
 
 # Acknowledgement
 
-This study was partly supported by NSF grant DEB \#2213567. I thank Harroop Bedi for his contribution on developing the prototype of the `rtrees` shinny app through the REU program at the Center of Computation & Techology at the Louisiana State University supported by NSF grant OAC \#1852454.
+This study was partly supported by NSF grant DEB \#2213567. I thank Harroop Bedi for his contribution on developing the prototype of the `rtrees` shinny app through the REU program at the Center of Computation & Techology at the Louisiana State University supported by NSF grant OAC \#1852454. -->
 
 
 # References
