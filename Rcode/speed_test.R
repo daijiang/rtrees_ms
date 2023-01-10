@@ -8,6 +8,7 @@ xfun::pkg_attach2(c("rtrees", "phylocomr", "microbenchmark", "tidyverse"))
 # I cannot use V.PhyloMaker::phylo.maker() and was forced to library it, 
 #     which is a little bit annoying.
 library(V.PhyloMaker) 
+library(V.PhyloMaker2) 
 
 d = read_delim("Data/plants_phylomatic_names.txt", "/", col_names = F) %>%
   set_names(c("family", "genus", "species")) %>%
@@ -18,6 +19,9 @@ d = read_delim("Data/plants_phylomatic_names.txt", "/", col_names = F) %>%
   select(species) %>% distinct()
 n_distinct(d$species)
 
+sp_missing = setdiff(d$species, megatrees::tree_plant_otl$tip.label)
+sp_in = intersect(d$species, megatrees::tree_plant_otl$tip.label)
+
 #' Function to test speed
 #' 
 #' @param n_sp_missing The number of missing species to be binded
@@ -25,7 +29,7 @@ n_distinct(d$species)
 #' @param n_times How many times to compare? Default of 5 should be enough.
 #' @return A data frame with the test methods, and their time used.
 #' 
-speed_test = function(n_sp_missing, n_sp_in = 500, n_times = 5){
+speed_test = function(n_sp_missing, n_sp_in = 500, n_times = 5, ...){
   test_sp = c(sample(sp_in, n_sp_in), sample(sp_missing, n_sp_missing))
   test_sp_df = rtrees::sp_list_df(sp_list = test_sp, taxon = "plant")
   test_sp_df = filter(test_sp_df, !is.na(family))
@@ -33,10 +37,11 @@ speed_test = function(n_sp_missing, n_sp_in = 500, n_times = 5){
                        phylom_sp = casefold(phylom_sp))
   # compare speed
   xx2 = microbenchmark::microbenchmark(
-    Phylomatic = phylocomr::ph_phylomatic(taxa = test_sp_df2$phylom_sp, phylo = megatrees::tree_plant_otl),
+    # Phylomatic = phylocomr::ph_phylomatic(taxa = test_sp_df2$phylom_sp, phylo = megatrees::tree_plant_otl),
     rtrees = get_tree(sp_list = test_sp_df, taxon = "plant"),
-    V.PhyloMaker = phylo.maker(sp.list = test_sp_df, scenarios = "S1"),
-    times = n_times
+    V.PhyloMaker = V.PhyloMaker::phylo.maker(sp.list = test_sp_df, scenarios = "S1"),
+    V.PhyloMaker2 = V.PhyloMaker2::phylo.maker(sp.list = test_sp_df, scenarios = "S1"),
+    times = n_times, ...
   )
   
   xx2 = as.data.frame(xx2) %>% 
@@ -48,6 +53,7 @@ speed_test = function(n_sp_missing, n_sp_in = 500, n_times = 5){
 # all tests have 500 species already in the megatree, then
 # start with 50 missing species, and 500, 1000, ..., 5000
 speed_out = purrr::map_dfr(c(50, seq(550, 5500, by = 500)-50), speed_test)
+speed_out = purrr::map_dfr(c(5000), speed_test, n_times = 1)
 # for some reason, phylocomr::ph_phylomatic does not work (no mssing species was inserted)
 # I thus removed it from the results
 saveRDS(filter(speed_out, expr != "Phylomatic"), "Data/rtrees_speed_out.rds")
