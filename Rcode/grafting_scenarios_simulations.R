@@ -136,13 +136,16 @@ eval_bind_loc = function(seed = 1, n_sp = 150, n_bind = 50,
   dplyr::select(out, type, sr = SR, pd = PD, mpd, mntd)
 }
 
-plan(multisession, workers = 50)
+if(!file.exists("Data/x_pd.rds")){
+  plan(multisession, workers = 50)
+  
+  x_pd = future_map(1:1000, .f = function(i){
+    try(eval_bind_loc(seed = i))
+  }, .progress = TRUE)
+  
+  saveRDS(x_pd, "Data/x_pd.rds")
+}
 
-x_pd = future_map(1:1000, .f = function(i){
-  try(eval_bind_loc(seed = i))
-}, .progress = TRUE)
-
-saveRDS(x_pd, "Data/x_pd.rds")
 
 # x_pd = readRDS("Data/x_pd.rds")
 
@@ -203,17 +206,15 @@ get_phy_sig_sim = function(i){
 # get_phy_sig_sim(1)
 
 # run it
-x_ps_1_1000 = vector("list", 1000)
-for(i in 1:1000){
-  cat("i =", i, "\t")
-  x_ps_1_1000[[i]] = try(get_phy_sig_sim(i))
-  if(i %% 10 == 0) 
-    saveRDS(x_ps_1_1000, file = "Data/x_ps_1_1000.rds")
+if(!file.exists("Data/x_ps_1_1000.rds")){
+  x_ps_1_1000 = vector("list", 1000)
+  for(i in 1:1000){
+    cat("i =", i, "\t")
+    x_ps_1_1000[[i]] = try(get_phy_sig_sim(i))
+    if(i %% 10 == 0) 
+      saveRDS(x_ps_1_1000, file = "Data/x_ps_1_1000.rds")
+  }
 }
-
-x_ps_1_1000 = readRDS("Data/x_ps_1_1000.rds")
-
-x_ps_1_1000_df = bind_rows(x_ps_1_1000[map(x_ps_1_1000, class) != "try-error"])
 
 ## data prep -------------------------
 
@@ -297,6 +298,10 @@ all_raw = bind_rows(
 )
 
 ### phylo signal
+x_ps_1_1000 = readRDS("Data/x_ps_1_1000.rds")
+
+x_ps_1_1000_df = bind_rows(x_ps_1_1000[map(x_ps_1_1000, class) != "try-error"])
+
 all_raw_ps = 
   x_ps_1_1000_df |> 
   set_names(c("method", "true", "at_basal_node", "at_or_above_basal", "random_below_basal")) |> 
@@ -424,7 +429,8 @@ ps_all = ps_k + ps_lambda
 
 pd_ps_all = pd_all / ps_all
 
-ggsave("pd_ps_scenarios.pdf", plot = pd_ps_all, width = 14, height = 9)
+ggsave("Figs/pd_ps_scenarios.pdf", plot = pd_ps_all, width = 14, height = 9)
+ggsave("Figs/pd_ps_scenarios.png", plot = pd_ps_all, width = 14, height = 9)
 
 
 # Plot for publication (2 scenarios) ====

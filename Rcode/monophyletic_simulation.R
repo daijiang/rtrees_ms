@@ -248,3 +248,4 @@ ps_all = ps_k + ps_lambda
 pd_ps_all = pd_all / ps_all
 
 ggsave("Figs/monophyletic.pdf", plot = pd_ps_all, width = 14, height = 9)
+ggsave("Figs/monophyletic.png", plot = pd_ps_all, width = 14, height = 9)
